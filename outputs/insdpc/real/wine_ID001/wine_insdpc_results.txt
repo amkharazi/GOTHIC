@@ -1,0 +1,25 @@
+dataset          = wine
+run_id           = wine_ID001
+seed             = 42
+split_strategy   = balanced
+train_fraction   = 0.8
+k_neighbors      = 15
+k_target         = 3
+
+Train NMI        = 0.376143
+Train AMI        = 0.367721
+Train ARI        = 0.364312
+Train FMI        = 0.581041
+Train Silhouette = 0.440983
+Train DB         = 0.577236
+Train CH         = 190.747204
+Train ACC        = 0.683099
+
+Test NMI         = 0.737003
+Test AMI         = 0.721507
+Test ARI         = 0.706990
+Test FMI         = 0.800040
+Test Silhouette  = 0.531481
+Test DB          = 0.611555
+Test CH          = 215.737767
+Test ACC         = 0.888889

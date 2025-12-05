@@ -1,0 +1,25 @@
+dataset          = pathbased
+run_id           = pathbased_ID001
+seed             = 42
+split_strategy   = balanced
+train_fraction   = 0.8
+k_neighbors      = 15
+k_target         = 3
+
+Train NMI        = 0.416672
+Train AMI        = 0.411971
+Train ARI        = 0.328238
+Train FMI        = 0.570635
+Train Silhouette = 0.383335
+Train DB         = 0.898417
+Train CH         = 165.879693
+Train ACC        = 0.575000
+
+Test NMI         = 0.439148
+Test AMI         = 0.420079
+Test ARI         = 0.346864
+Test FMI         = 0.569528
+Test Silhouette  = 0.422196
+Test DB          = 1.533331
+Test CH          = 143.191106
+Test ACC         = 0.666667
