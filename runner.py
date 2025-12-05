@@ -11,11 +11,12 @@ Usage examples:
 Any arguments after `--model ...` are forwarded to the corresponding model script.
 
 Currently supported:
-  --model gothic   -> gothic_model.py
-  --model kmeans   -> kmeans_model.py
-  --model dbscan   -> dbscan_model.py
-  --model hdbscan  -> hdbscan_model.py
-  --model insdpc   -> insdpc_model
+  --model gothic     -> gothic_model.py
+  --model kmeans     -> kmeans_model.py
+  --model dbscan     -> dbscan_model.py
+  --model hdbscan    -> hdbscan_model.py
+  --model insdpc     -> insdpc_model.py
+  --model amd_dbscan -> amd_dbscan_model.py
 """
 
 import sys
@@ -50,8 +51,10 @@ def main():
         script = root / "hdbscan_model.py"
     elif model == "insdpc":
         script = root / "insdpc_model.py"
+    elif model == "amd_dbscan":
+        script = root / "amd_dbscan_model.py"
     else:
-        raise ValueError(f"Unknown model '{model}'. Currently supported: gothic , kmeans, dbscan, hdbscan, insdpc ")
+        raise ValueError(f"Unknown model '{model}'. Currently supported: gothic , kmeans, dbscan, hdbscan, insdpc, amd_dbscan ")
 
     cmd = [sys.executable, str(script)] + remaining
 
