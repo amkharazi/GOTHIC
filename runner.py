@@ -13,6 +13,7 @@ Any arguments after `--model ...` are forwarded to the corresponding model scrip
 Currently supported:
   --model gothic   -> gothic_model.py
   --model kmeans   -> kmeans_model.py
+  --model dbscan   -> dbscan_model.py
 """
 
 import sys
@@ -41,8 +42,10 @@ def main():
         script = root / "gothic_model.py"
     elif model == "kmeans":
         script = root / "kmeans_model.py"
+    elif model == "dbscan":
+        script = root / "dbscan_model.py"
     else:
-        raise ValueError(f"Unknown model '{model}'. Currently supported: gothic , kmeans")
+        raise ValueError(f"Unknown model '{model}'. Currently supported: gothic , kmeans, dbscan")
 
     cmd = [sys.executable, str(script)] + remaining
 
