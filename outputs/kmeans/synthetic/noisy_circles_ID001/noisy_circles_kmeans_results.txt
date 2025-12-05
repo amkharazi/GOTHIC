@@ -1,0 +1,26 @@
+dataset          = noisy_circles
+run_id           = noisy_circles_ID001
+seed             = 42
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 2
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+
+Train NMI        = 0.000451
+Train AMI        = -0.000000
+Train ARI        = -0.000000
+Train FMI        = 0.499764
+Train Silhouette = 0.357977
+Train DB         = 1.166147
+Train CH         = 960.874469
+Train ACC        = 0.512500
+
+Test NMI         = 0.003055
+Test AMI         = 0.001246
+Test ARI         = 0.001726
+Test FMI         = 0.499918
+Test Silhouette  = 0.312879
+Test DB          = 1.329413
+Test CH          = 176.765977
+Test ACC         = 0.532500

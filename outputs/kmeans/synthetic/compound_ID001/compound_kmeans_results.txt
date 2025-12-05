@@ -1,0 +1,26 @@
+dataset          = compound
+run_id           = compound_ID001
+seed             = 42
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 6
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+
+Train NMI        = 0.704277
+Train AMI        = 0.696614
+Train ARI        = 0.534513
+Train FMI        = 0.639180
+Train Silhouette = 0.423602
+Train DB         = 0.850420
+Train CH         = 698.355583
+Train ACC        = 0.661442
+
+Test NMI         = 0.768997
+Test AMI         = 0.740220
+Test ARI         = 0.592954
+Test FMI         = 0.684594
+Test Silhouette  = 0.571689
+Test DB          = 0.621295
+Test CH          = 252.245511
+Test ACC         = 0.737500

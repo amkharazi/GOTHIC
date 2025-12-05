@@ -1,0 +1,26 @@
+dataset          = breast_cancer
+run_id           = breast_cancer_ID001
+seed             = 42
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 2
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+
+Train NMI        = 0.512369
+Train AMI        = 0.511490
+Train ARI        = 0.554732
+Train FMI        = 0.812427
+Train Silhouette = 0.682286
+Train DB         = 0.504096
+Train CH         = 1053.224881
+Train ACC        = 0.875000
+
+Test NMI         = 0.198223
+Test AMI         = 0.190220
+Test ARI         = 0.147718
+Test FMI         = 0.718704
+Test Silhouette  = 0.721178
+Test DB          = 0.389686
+Test CH          = 189.328133
+Test ACC         = 0.716814

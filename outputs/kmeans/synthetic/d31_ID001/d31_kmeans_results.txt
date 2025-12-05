@@ -1,0 +1,26 @@
+dataset          = d31
+run_id           = d31_ID001
+seed             = 42
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 31
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+
+Train NMI        = 0.960721
+Train AMI        = 0.958254
+Train ARI        = 0.940584
+Train FMI        = 0.942478
+Train Silhouette = 0.532770
+Train DB         = 0.609541
+Train CH         = 6212.194990
+Train ACC        = 0.970565
+
+Test NMI         = 1.000000
+Test AMI         = 1.000000
+Test ARI         = 1.000000
+Test FMI         = 1.000000
+Test Silhouette  = 0.823247
+Test DB          = 0.263538
+Test CH          = 8597.178473
+Test ACC         = 1.000000
