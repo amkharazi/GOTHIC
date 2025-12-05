@@ -1,0 +1,54 @@
+"""
+runner.py
+
+Generic runner for clustering models.
+
+Usage examples:
+
+  # Run GOTHIC on Compound
+  python runner.py --model gothic --run_id ID001 --dataset compound --k_target 6 --n_micro 80
+
+Any arguments after `--model ...` are forwarded to the corresponding model script.
+
+Currently supported:
+  --model gothic   -> gothic_model.py
+"""
+
+import sys
+from pathlib import Path
+import subprocess
+import argparse
+
+
+def main():
+    root = Path(__file__).resolve().parent
+
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="gothic",
+        help="Which model to run (e.g., 'gothic')."
+    )
+
+    # Parse only --model, leave the rest to be forwarded
+    args, remaining = parser.parse_known_args()
+
+    model = args.model.lower()
+
+    if model == "gothic":
+        script = root / "gothic_model.py"
+    else:
+        raise ValueError(f"Unknown model '{model}'. Currently supported: gothic")
+
+    cmd = [sys.executable, str(script)] + remaining
+
+    print("[RUNNER] Selected model:", model)
+    print("[RUNNER] Executing command:")
+    print("         " + " ".join(cmd))
+
+    subprocess.run(cmd, check=True)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,26 @@
+dataset          = r15
+run_id           = r15_ID001
+seed             = 42
+split_strategy   = balanced
+train_fraction   = 0.8
+n_micro          = 45
+k_target         = 15
+dist_quantile    = 0.3
+
+Train NMI        = 0.981913
+Train AMI        = 0.980193
+Train ARI        = 0.973223
+Train FMI        = 0.974959
+Train Silhouette = 0.717938
+Train DB         = 0.358818
+Train CH         = 3171.344957
+Train ACC        = 0.987500
+
+Test NMI         = 1.000000
+Test AMI         = 1.000000
+Test ARI         = 1.000000
+Test FMI         = 1.000000
+Test Silhouette  = 0.924281
+Test DB          = 0.111686
+Test CH          = 7764.452152
+Test ACC         = 1.000000
