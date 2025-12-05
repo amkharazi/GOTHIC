@@ -1,0 +1,27 @@
+dataset                = jain
+run_id                 = jain_ID001
+seed                   = 42
+split_strategy         = balanced
+train_fraction         = 0.8
+min_cluster_size       = 5
+min_samples            = 5
+cluster_selection_eps  = 0.0
+cluster_selection_meth = eom
+
+Train NMI              = 0.763824
+Train AMI              = 0.761599
+Train ARI              = 0.896321
+Train FMI              = 0.958040
+Train Silhouette       = 0.205574
+Train DB               = 1.500601
+Train CH               = 78.654973
+Train ACC              = 0.822742
+
+Test NMI               = 0.876768
+Test AMI               = 0.873796
+Test ARI               = 0.939956
+Test FMI               = 0.976165
+Test Silhouette        = 0.333267
+Test DB                = 0.729043
+Test CH                = 40.564365
+Test ACC               = 0.824324

@@ -1,0 +1,27 @@
+dataset                = r15
+run_id                 = r15_ID001
+seed                   = 42
+split_strategy         = balanced
+train_fraction         = 0.8
+min_cluster_size       = 5
+min_samples            = 5
+cluster_selection_eps  = 0.0
+cluster_selection_meth = eom
+
+Train NMI              = 0.742508
+Train AMI              = 0.727763
+Train ARI              = 0.262510
+Train FMI              = 0.453901
+Train Silhouette       = 0.648094
+Train DB               = 0.355522
+Train CH               = 602.087745
+Train ACC              = 0.533333
+
+Test NMI               = 0.742508
+Test AMI               = 0.674903
+Test ARI               = 0.244444
+Test FMI               = 0.435745
+Test Silhouette        = 0.680849
+Test DB                = 0.310293
+Test CH                = 148.594209
+Test ACC               = 0.533333

@@ -14,6 +14,7 @@ Currently supported:
   --model gothic   -> gothic_model.py
   --model kmeans   -> kmeans_model.py
   --model dbscan   -> dbscan_model.py
+  --model hdbscan   -> hdbscan_model.py
 """
 
 import sys
@@ -44,8 +45,10 @@ def main():
         script = root / "kmeans_model.py"
     elif model == "dbscan":
         script = root / "dbscan_model.py"
+    elif model == "hdbscan":
+        script = root / "hdbscan_model.py"
     else:
-        raise ValueError(f"Unknown model '{model}'. Currently supported: gothic , kmeans, dbscan")
+        raise ValueError(f"Unknown model '{model}'. Currently supported: gothic , kmeans, dbscan, hdbscan, ")
 
     cmd = [sys.executable, str(script)] + remaining
 
