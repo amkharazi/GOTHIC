@@ -1,0 +1,28 @@
+dataset          = aggregation
+run_id           = aggregation_ID001
+seed             = 42
+split_strategy   = balanced
+train_fraction   = 0.8
+eps_min          = 0.050000
+eps_max          = 1.000000
+n_levels         = 10
+min_samples      = 5
+chosen_eps       = 1.000000
+
+Train NMI        = 0.634312
+Train AMI        = 0.606955
+Train ARI        = 0.481402
+Train FMI        = 0.583235
+Train Silhouette = 0.041708
+Train DB         = 1.177571
+Train CH         = 56.385869
+Train ACC        = 0.533333
+
+Test NMI         = 0.616726
+Test AMI         = 0.537517
+Test ARI         = 0.420284
+Test FMI         = 0.547497
+Test Silhouette  = -0.204677
+Test DB          = 1.187251
+Test CH          = 8.462204
+Test ACC         = 0.569620

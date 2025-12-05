@@ -1,0 +1,28 @@
+dataset          = flame
+run_id           = flame_ID001
+seed             = 42
+split_strategy   = balanced
+train_fraction   = 0.8
+eps_min          = 0.050000
+eps_max          = 1.000000
+n_levels         = 10
+min_samples      = 5
+chosen_eps       = 1.000000
+
+Train NMI        = 0.456859
+Train AMI        = 0.447756
+Train ARI        = 0.365232
+Train FMI        = 0.627502
+Train Silhouette = 0.204001
+Train DB         = 0.822542
+Train CH         = 80.560905
+Train ACC        = 0.604167
+
+Test NMI         = 0.386213
+Test AMI         = 0.353564
+Test ARI         = 0.212856
+Test FMI         = 0.540730
+Test Silhouette  = 0.075394
+Test DB          = 0.889538
+Test CH          = 15.163079
+Test ACC         = 0.583333

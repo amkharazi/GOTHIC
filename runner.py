@@ -17,6 +17,7 @@ Currently supported:
   --model hdbscan    -> hdbscan_model.py
   --model insdpc     -> insdpc_model.py
   --model amd_dbscan -> amd_dbscan_model.py
+  --model mdbscan    -> mdbscan_model.py
 """
 
 import sys
@@ -53,8 +54,10 @@ def main():
         script = root / "insdpc_model.py"
     elif model == "amd_dbscan":
         script = root / "amd_dbscan_model.py"
+    elif model == "mdbscan":
+        script = root / "mdbscan_model.py"
     else:
-        raise ValueError(f"Unknown model '{model}'. Currently supported: gothic , kmeans, dbscan, hdbscan, insdpc, amd_dbscan ")
+        raise ValueError(f"Unknown model '{model}'. Currently supported: gothic , kmeans, dbscan, hdbscan, insdpc, amd_dbscan, mdbscan ")
 
     cmd = [sys.executable, str(script)] + remaining
 
