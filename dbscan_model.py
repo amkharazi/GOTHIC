@@ -17,6 +17,12 @@ Pipeline:
   6) Save plots (transparent) and results under out_dir/run_id/.
 """
 
+MODEL_NAME = "dbscan"
+
+import csv
+import json
+from datetime import datetime
+
 import argparse
 from pathlib import Path
 from typing import Dict, Any
@@ -121,6 +127,70 @@ def parse_args(argv=None):
 
 
 # =========================== UTILITIES =============================
+
+def _to_csv_value(v):
+    """Convert values to something safe/flat for CSV."""
+    if isinstance(v, (dict, list, tuple)):
+        return json.dumps(v, ensure_ascii=False)
+    if isinstance(v, (Path,)):
+        return str(v)
+    return v
+
+
+def append_row_to_csv(csv_path: Path, row: Dict[str, Any]) -> None:
+    """
+    Append a row to csv_path. If file doesn't exist, create it with header.
+    If file exists but header is missing new columns, rewrite with union header.
+    """
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
+    row = {k: _to_csv_value(v) for k, v in row.items()}
+
+    if not csv_path.exists():
+        with open(csv_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=list(row.keys()))
+            writer.writeheader()
+            writer.writerow(row)
+        return
+
+    # Read existing header
+    with open(csv_path, "r", newline="", encoding="utf-8") as f:
+        reader = csv.reader(f)
+        try:
+            header = next(reader)
+        except StopIteration:
+            header = []
+
+    if not header:
+        with open(csv_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=list(row.keys()))
+            writer.writeheader()
+            writer.writerow(row)
+        return
+
+    header_set = set(header)
+    missing = [k for k in row.keys() if k not in header_set]
+
+    if missing:
+        # Upgrade header: read all rows then rewrite
+        with open(csv_path, "r", newline="", encoding="utf-8") as f:
+            old_reader = csv.DictReader(f)
+            old_rows = list(old_reader)
+            old_fieldnames = old_reader.fieldnames or header
+
+        new_fieldnames = list(old_fieldnames) + missing
+
+        with open(csv_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=new_fieldnames)
+            writer.writeheader()
+            for r in old_rows:
+                writer.writerow({k: r.get(k, "") for k in new_fieldnames})
+            writer.writerow({k: row.get(k, "") for k in new_fieldnames})
+        return
+
+    # Append normally
+    with open(csv_path, "a", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=header)
+        writer.writerow({k: row.get(k, "") for k in header})
 
 def train_test_split_with_strategy(X, y, train_frac=0.8, strategy="balanced", seed=42):
     """
@@ -480,6 +550,53 @@ def dbscan_main(args=None) -> Dict[str, Any]:
 
     print(f"[INFO] Saved DBSCAN scalar results to: {results_txt_path}")
 
+    # ================== APPEND RUN SUMMARY TO CSV ==================
+    summary_csv_path = Path.cwd() / "results_summary.csv"
+
+    row = {
+        # identifiers
+        "timestamp_utc": datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        "dataset": dataset,
+        "model": MODEL_NAME,
+        "run_id": args.run_id,
+
+        # configs
+        "seed": args.seed,
+        "split_strategy": args.split_strategy,
+        "train_fraction": args.train_fraction,
+
+        "eps": args.eps,
+        "min_samples": args.min_samples,
+
+        # metrics (train)
+        "train_nmi": nmi_train,
+        "train_ami": ami_train,
+        "train_ari": ari_train,
+        "train_fmi": fmi_train,
+        "train_sil": sil_train,
+        "train_db": db_train_val,
+        "train_ch": ch_train,
+        "train_acc": acc_train,
+
+        # metrics (test)
+        "test_nmi": nmi_test,
+        "test_ami": ami_test,
+        "test_ari": ari_test,
+        "test_fmi": fmi_test,
+        "test_sil": sil_test,
+        "test_db": db_test_val,
+        "test_ch": ch_test,
+        "test_acc": acc_test,
+
+        # artifacts
+        "results_txt": str(results_txt_path),
+        "figures_dir": str(figures_dir),
+        "train_test_png": str(train_test_path),
+    }
+
+    append_row_to_csv(summary_csv_path, row)
+    print(f"[INFO] Appended run summary to CSV: {summary_csv_path}")
+
     return {
         "dataset": dataset,
         "run_id": args.run_id,
@@ -490,6 +607,7 @@ def dbscan_main(args=None) -> Dict[str, Any]:
         "results_txt": str(results_txt_path),
         "train_test_png": str(train_test_path),
         "figures_dir": str(figures_dir),
+        "summary_csv": str(summary_csv_path),
     }
 
 

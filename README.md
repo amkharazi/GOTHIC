@@ -8,6 +8,7 @@ Checkout `run.sh` for the runner scripts.
 > python runner.py --model gothic --run_id compound_ID001 --dataset compound --seed 42 --train_fraction 0.8 --split_strategy balanced --n_micro 91 --kmeans_n_init 50 --kmeans_max_iter 500 --dist_quantile 0.3 --b_boundary 5 --d_model 32 --n_heads 4 --attn_hidden 64 --n_transformer_layers 2 --train_epochs 2000 --lr 0.001 --weight_decay 0.0001 --k_target 6 --data_root datasets --out_dir outputs
 > ```
 
+reminder: `"C:\Program Files\Git\usr\bin\bash.exe" -lc "cd /c/Git/GOTHIC && sed -i 's/\r$//' run.sh && bash run.sh"`
 ---
 
 # GOTHIC: Graph-Overclustered Transformer-based Hierarchical Integrated Clustering

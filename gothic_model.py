@@ -15,6 +15,12 @@ Pipeline (for a chosen dataset):
   8) Save plots, metrics, and checkpoint to disk under outputs/<run_id>/.
 """
 
+MODEL_NAME = "gothic"
+
+import csv
+import json
+from datetime import datetime
+
 import argparse
 import math
 import sys
@@ -164,6 +170,74 @@ def parse_args(argv=None):
 
 
 # =========================== UTILITIES =============================
+
+def _to_csv_value(v):
+    """Convert values to something safe/flat for CSV."""
+    if isinstance(v, (dict, list, tuple)):
+        return json.dumps(v, ensure_ascii=False)
+    if isinstance(v, (Path,)):
+        return str(v)
+    return v
+
+
+def append_row_to_csv(csv_path: Path, row: Dict[str, Any]) -> None:
+    """
+    Append a row to csv_path. If file doesn't exist, create it with header.
+    If file exists but header is missing new columns, rewrite with union header.
+    """
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
+    row = {k: _to_csv_value(v) for k, v in row.items()}
+
+    if not csv_path.exists():
+        # New file: write header + row
+        with open(csv_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=list(row.keys()))
+            writer.writeheader()
+            writer.writerow(row)
+        return
+
+    # Existing file: read header
+    with open(csv_path, "r", newline="", encoding="utf-8") as f:
+        reader = csv.reader(f)
+        try:
+            header = next(reader)
+        except StopIteration:
+            header = []
+
+    header_set = set(header)
+    row_keys = list(row.keys())
+    missing = [k for k in row_keys if k not in header_set]
+
+    if not header:
+        # Empty file: treat like new
+        with open(csv_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=row_keys)
+            writer.writeheader()
+            writer.writerow(row)
+        return
+
+    if missing:
+        # Need to upgrade header: read all existing rows as dicts, then rewrite
+        with open(csv_path, "r", newline="", encoding="utf-8") as f:
+            old_reader = csv.DictReader(f)
+            old_rows = list(old_reader)
+            old_fieldnames = old_reader.fieldnames or header
+
+        new_fieldnames = list(old_fieldnames) + missing
+
+        with open(csv_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=new_fieldnames)
+            writer.writeheader()
+            for r in old_rows:
+                writer.writerow({k: r.get(k, "") for k in new_fieldnames})
+            writer.writerow({k: row.get(k, "") for k in new_fieldnames})
+        return
+
+    # Header matches: append normally
+    with open(csv_path, "a", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=header)
+        writer.writerow({k: row.get(k, "") for k in header})
+
 
 def train_test_split_with_strategy(X, y, train_frac=0.8, strategy="balanced", seed=42):
     rng = np.random.RandomState(seed)
@@ -1162,6 +1236,71 @@ def gothic_main(args=None) -> Dict[str, Any]:
 
     print(f"[INFO] Saved scalar results to: {results_txt_path}")
 
+    # ================== APPEND RUN SUMMARY TO CSV ==================
+    summary_csv_path = Path.cwd() / "results_summary.csv"
+
+    row = {
+        # identifiers
+        "timestamp_utc": datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        "dataset": dataset,
+        "model": MODEL_NAME,
+        "run_id": args.run_id,
+        "device": str(device),
+
+        # configs
+        "seed": args.seed,
+        "split_strategy": args.split_strategy,
+        "train_fraction": args.train_fraction,
+
+        "n_micro": args.n_micro,
+        "k_target": k_target,
+
+        "kmeans_n_init": args.kmeans_n_init,
+        "kmeans_max_iter": args.kmeans_max_iter,
+
+        "dist_quantile": args.dist_quantile,
+        "dist_thresh": float(dist_thresh),     # computed threshold used for edges
+        "b_boundary": args.b_boundary,
+
+        "d_model": args.d_model,
+        "n_heads": args.n_heads,
+        "attn_hidden": args.attn_hidden,
+        "n_transformer_layers": args.n_transformer_layers,
+        "train_epochs": args.train_epochs,
+        "lr": args.lr,
+        "weight_decay": args.weight_decay,
+
+        # metrics (train)
+        "train_nmi": nmi_train,
+        "train_ami": ami_train,
+        "train_ari": ari_train,
+        "train_fmi": fmi_train,
+        "train_sil": sil_train,
+        "train_db": db_train,
+        "train_ch": ch_train,
+        "train_acc": acc_train,
+
+        # metrics (test)
+        "test_nmi": nmi_test,
+        "test_ami": ami_test,
+        "test_ari": ari_test,
+        "test_fmi": fmi_test,
+        "test_sil": sil_test,
+        "test_db": db_test,
+        "test_ch": ch_test,
+        "test_acc": acc_test,
+
+        # artifacts (handy for later)
+        "results_txt": str(results_txt_path),
+        "figures_dir": str(figures_dir),
+        "micro_graph_png": str(graph_path),
+        "train_test_png": str(results_fig_path),
+    }
+
+    append_row_to_csv(summary_csv_path, row)
+    print(f"[INFO] Appended run summary to CSV: {summary_csv_path}")
+
+
     return {
         "dataset": dataset,
         "run_id": args.run_id,
@@ -1173,6 +1312,7 @@ def gothic_main(args=None) -> Dict[str, Any]:
         "micro_graph_png": str(graph_path),
         "train_test_png": str(results_fig_path),
         "figures_dir": str(figures_dir),
+        "summary_csv": str(summary_csv_path),
     }
 
 

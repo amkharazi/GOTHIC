@@ -7,14 +7,14 @@ n_micro          = 45
 k_target         = 15
 dist_quantile    = 0.3
 
-Train NMI        = 0.981913
-Train AMI        = 0.980193
-Train ARI        = 0.973223
-Train FMI        = 0.974959
-Train Silhouette = 0.717938
-Train DB         = 0.358818
-Train CH         = 3171.344957
-Train ACC        = 0.987500
+Train NMI        = 0.993129
+Train AMI        = 0.992476
+Train ARI        = 0.990947
+Train FMI        = 0.991533
+Train Silhouette = 0.723668
+Train DB         = 0.356473
+Train CH         = 3257.947017
+Train ACC        = 0.995833
 
 Test NMI         = 1.000000
 Test AMI         = 1.000000

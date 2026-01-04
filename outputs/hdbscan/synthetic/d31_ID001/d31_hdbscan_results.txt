@@ -8,14 +8,14 @@ min_samples            = 5
 cluster_selection_eps  = 0.0
 cluster_selection_meth = eom
 
-Train NMI              = 0.765568
-Train AMI              = 0.755394
-Train ARI              = 0.328635
-Train FMI              = 0.445490
-Train Silhouette       = 0.306738
-Train DB               = 3.882952
-Train CH               = 795.923876
-Train ACC              = 0.482258
+Train NMI              = 0.764750
+Train AMI              = 0.754540
+Train ARI              = 0.327992
+Train FMI              = 0.444783
+Train Silhouette       = 0.306652
+Train DB               = 3.600401
+Train CH               = 798.143379
+Train ACC              = 0.481855
 
 Test NMI               = 0.835569
 Test AMI               = 0.805121
