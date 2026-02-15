@@ -1,0 +1,38 @@
+dataset          = compound
+model            = idec
+run_id           = compound_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 6
+
+latent_dim       = 16
+hidden_dim       = 128
+dropout          = 0.0
+batch_size       = 256
+pretrain_epochs  = 100
+finetune_epochs  = 200
+lr               = 0.001
+weight_decay     = 0.0
+alpha            = 1.0
+gamma            = 1.0
+update_interval  = 10
+
+Train NMI        = 0.703804
+Train AMI        = 0.696106
+Train ARI        = 0.531727
+Train FMI        = 0.637025
+Train Sil(Z)     = 0.461005
+Train DB(Z)      = 0.741636
+Train CH(Z)      = 858.000079
+Train ACC        = 0.661442
+
+Test NMI         = 0.802241
+Test AMI         = 0.777579
+Test ARI         = 0.603824
+Test FMI         = 0.694038
+Test Sil(Z)      = 0.644527
+Test DB(Z)       = 0.483332
+Test CH(Z)       = 393.121983
+Test ACC         = 0.725000

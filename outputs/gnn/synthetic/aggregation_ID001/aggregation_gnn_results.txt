@@ -1,0 +1,37 @@
+dataset          = aggregation
+model            = gnn
+run_id           = aggregation_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 7
+
+knn_k            = 10
+hidden_dim       = 64
+embed_dim        = 16
+dropout          = 0.1
+lr               = 0.01
+weight_decay     = 0.0001
+epochs           = 200
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+metric_space     = Z
+
+Train NMI        = 0.610238
+Train AMI        = 0.603591
+Train ARI        = 0.387644
+Train FMI        = 0.506519
+Train Sil(Z)     = 0.420508
+Train DB(Z)      = 0.802896
+Train CH(Z)      = 589.587924
+Train ACC        = 0.533333
+
+Test NMI         = 0.675641
+Test AMI         = 0.649493
+Test ARI         = 0.427031
+Test FMI         = 0.549035
+Test Sil(Z)      = 0.418203
+Test DB(Z)       = 0.609358
+Test CH(Z)       = 229.704911
+Test ACC         = 0.607595

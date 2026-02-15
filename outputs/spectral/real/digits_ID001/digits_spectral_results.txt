@@ -1,0 +1,28 @@
+dataset          = digits
+run_id           = digits_ID001
+seed             = 42
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 10
+affinity         = rbf
+gamma            = 1.0
+n_neighbors      = 10
+assign_labels    = kmeans
+
+Train NMI        = 0.012331
+Train AMI        = 0.000073
+Train ARI        = 0.000037
+Train FMI        = 0.313351
+Train Silhouette = -0.191832
+Train DB         = 1.045162
+Train CH         = 0.986660
+Train ACC        = 0.105007
+
+Test NMI         = 0.000000
+Test AMI         = 0.000000
+Test ARI         = 0.000000
+Test FMI         = 0.312264
+Test Silhouette  = nan
+Test DB          = nan
+Test CH          = nan
+Test ACC         = 0.103064

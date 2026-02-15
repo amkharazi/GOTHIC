@@ -1,0 +1,40 @@
+dataset          = olivetti_faces
+model            = gnn_contrastive
+run_id           = olivetti_faces_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 40
+
+knn_k            = 10
+hidden_dim       = 128
+embed_dim        = 64
+dropout          = 0.1
+epochs           = 300
+lr               = 0.001
+weight_decay     = 0.0001
+temperature      = 0.2
+edge_drop        = 0.2
+feat_drop        = 0.2
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+metric_space     = Z
+
+Train NMI        = 0.680113
+Train AMI        = 0.416435
+Train ARI        = 0.274594
+Train FMI        = 0.293205
+Train Sil(Z)     = 0.356995
+Train DB(Z)      = 0.923344
+Train CH(Z)      = 92.125486
+Train ACC        = 0.453125
+
+Test NMI         = 0.616963
+Test AMI         = 0.283838
+Test ARI         = 0.088287
+Test FMI         = 0.213920
+Test Sil(Z)      = 0.179079
+Test DB(Z)       = 0.919385
+Test CH(Z)       = 31.387799
+Test ACC         = 0.200000

@@ -3,17 +3,36 @@ run_id           = flame_ID001
 seed             = 42
 split_strategy   = balanced
 train_fraction   = 0.8
+
+reduce_dim       = none
+pca_trigger_dim  = 100
+pca_dim          = 64
+max_density_dim  = 64
+used_dim         = 2
+
 n_micro          = 25
 k_target         = 2
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
 dist_quantile    = 0.3
+dist_thresh      = 4.4777750968933105
+b_boundary       = 5
+
+d_model          = 32
+n_heads          = 4
+attn_hidden      = 64
+n_transformer_layers = 2
+train_epochs     = 2000
+lr               = 0.001
+weight_decay     = 0.0001
 
 Train NMI        = 0.923533
 Train AMI        = 0.923226
 Train ARI        = 0.958387
 Train FMI        = 0.980518
 Train Silhouette = 0.261938
-Train DB         = 1.445005
-Train CH         = 62.416967
+Train DB         = 1.445008
+Train CH         = 62.416969
 Train ACC        = 0.989583
 
 Test NMI         = 1.000000
@@ -22,5 +41,5 @@ Test ARI         = 1.000000
 Test FMI         = 1.000000
 Test Silhouette  = 0.698283
 Test DB          = 0.384263
-Test CH          = 122.443692
+Test CH          = 122.443690
 Test ACC         = 1.000000

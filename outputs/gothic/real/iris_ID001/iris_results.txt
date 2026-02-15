@@ -3,17 +3,36 @@ run_id           = iris_ID001
 seed             = 42
 split_strategy   = balanced
 train_fraction   = 0.8
+
+reduce_dim       = none
+pca_trigger_dim  = 100
+pca_dim          = 64
+max_density_dim  = 64
+used_dim         = 4
+
 n_micro          = 70
 k_target         = 3
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
 dist_quantile    = 0.3
+dist_thresh      = 1.3616160154342651
+b_boundary       = 5
+
+d_model          = 32
+n_heads          = 4
+attn_hidden      = 64
+n_transformer_layers = 2
+train_epochs     = 2000
+lr               = 0.001
+weight_decay     = 0.0001
 
 Train NMI        = 0.929058
 Train AMI        = 0.927939
 Train ARI        = 0.950417
 Train FMI        = 0.966667
 Train Silhouette = 0.468336
-Train DB         = 0.824448
-Train CH         = 340.041754
+Train DB         = 0.824447
+Train CH         = 340.041770
 Train ACC        = 0.983333
 
 Test NMI         = 1.000000
@@ -22,5 +41,5 @@ Test ARI         = 1.000000
 Test FMI         = 1.000000
 Test Silhouette  = 0.696747
 Test DB          = 0.410451
-Test CH          = 267.992687
+Test CH          = 267.992746
 Test ACC         = 1.000000

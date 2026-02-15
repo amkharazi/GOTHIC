@@ -1,0 +1,40 @@
+dataset          = d31
+model            = gnn_contrastive
+run_id           = d31_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 31
+
+knn_k            = 10
+hidden_dim       = 128
+embed_dim        = 64
+dropout          = 0.1
+epochs           = 300
+lr               = 0.001
+weight_decay     = 0.0001
+temperature      = 0.2
+edge_drop        = 0.2
+feat_drop        = 0.2
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+metric_space     = Z
+
+Train NMI        = 0.827346
+Train AMI        = 0.816388
+Train ARI        = 0.627592
+Train FMI        = 0.640717
+Train Sil(Z)     = 0.415592
+Train DB(Z)      = 0.786585
+Train CH(Z)      = 4634.991488
+Train ACC        = 0.696371
+
+Test NMI         = 0.906961
+Test AMI         = 0.881128
+Test ARI         = 0.746583
+Test FMI         = 0.758466
+Test Sil(Z)      = 0.564281
+Test DB(Z)       = 0.601991
+Test CH(Z)       = 1791.017568
+Test ACC         = 0.791935

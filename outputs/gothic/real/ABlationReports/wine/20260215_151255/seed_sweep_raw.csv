@@ -1,0 +1,9 @@
+tag,dataset,run_id,seed,test_acc,test_nmi,test_ari,test_ami,test_fmi,results_txt
+seed_sweep,wine,wine_seed0000_BASE,0,0.944444,0.858461,0.838845,0.850121,0.890045,outputs\gothic\real\wine_seed0000_BASE\wine_results.txt
+seed_sweep,wine,wine_seed0001_BASE,1,0.944444,0.858461,0.838845,0.850121,0.890045,outputs\gothic\real\wine_seed0001_BASE\wine_results.txt
+seed_sweep,wine,wine_seed0002_BASE,2,0.944444,0.858461,0.838845,0.850121,0.890045,outputs\gothic\real\wine_seed0002_BASE\wine_results.txt
+seed_sweep,wine,wine_seed0003_BASE,3,0.944444,0.858461,0.838845,0.850121,0.890045,outputs\gothic\real\wine_seed0003_BASE\wine_results.txt
+seed_sweep,wine,wine_seed0004_BASE,4,0.944444,0.858461,0.838845,0.850121,0.890045,outputs\gothic\real\wine_seed0004_BASE\wine_results.txt
+seed_sweep,wine,wine_seed0042_BASE,42,0.944444,0.858461,0.838845,0.850121,0.890045,outputs\gothic\real\wine_seed0042_BASE\wine_results.txt
+seed_sweep,wine,wine_seed1337_BASE,1337,0.944444,0.858461,0.838845,0.850121,0.890045,outputs\gothic\real\wine_seed1337_BASE\wine_results.txt
+seed_sweep,wine,wine_seed2024_BASE,2024,0.944444,0.858461,0.838845,0.850121,0.890045,outputs\gothic\real\wine_seed2024_BASE\wine_results.txt

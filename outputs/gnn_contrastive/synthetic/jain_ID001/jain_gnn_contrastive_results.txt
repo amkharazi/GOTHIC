@@ -1,0 +1,40 @@
+dataset          = jain
+model            = gnn_contrastive
+run_id           = jain_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 2
+
+knn_k            = 10
+hidden_dim       = 128
+embed_dim        = 64
+dropout          = 0.1
+epochs           = 300
+lr               = 0.001
+weight_decay     = 0.0001
+temperature      = 0.2
+edge_drop        = 0.2
+feat_drop        = 0.2
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+metric_space     = Z
+
+Train NMI        = 0.516166
+Train AMI        = 0.514852
+Train ARI        = 0.530542
+Train FMI        = 0.797534
+Train Sil(Z)     = 0.471206
+Train DB(Z)      = 0.990106
+Train CH(Z)      = 262.827118
+Train ACC        = 0.866221
+
+Test NMI         = 0.464217
+Test AMI         = 0.458172
+Test ARI         = 0.447473
+Test FMI         = 0.757411
+Test Sil(Z)      = 0.722987
+Test DB(Z)       = 0.432647
+Test CH(Z)       = 338.579775
+Test ACC         = 0.837838

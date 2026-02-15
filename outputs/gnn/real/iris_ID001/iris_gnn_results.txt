@@ -1,0 +1,37 @@
+dataset          = iris
+model            = gnn
+run_id           = iris_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 3
+
+knn_k            = 10
+hidden_dim       = 64
+embed_dim        = 16
+dropout          = 0.1
+lr               = 0.01
+weight_decay     = 0.0001
+epochs           = 200
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+metric_space     = Z
+
+Train NMI        = 0.929058
+Train AMI        = 0.927939
+Train ARI        = 0.950417
+Train FMI        = 0.966667
+Train Sil(Z)     = 0.791852
+Train DB(Z)      = 0.302259
+Train CH(Z)      = 983.922361
+Train ACC        = 0.983333
+
+Test NMI         = 0.802731
+Test AMI         = 0.788376
+Test ARI         = 0.806667
+Test FMI         = 0.866667
+Test Sil(Z)      = 0.810880
+Test DB(Z)       = 0.292491
+Test CH(Z)       = 224.806495
+Test ACC         = 0.933333

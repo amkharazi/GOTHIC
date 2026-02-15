@@ -1,0 +1,37 @@
+dataset          = wine
+model            = gnn
+run_id           = wine_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 3
+
+knn_k            = 10
+hidden_dim       = 64
+embed_dim        = 16
+dropout          = 0.1
+lr               = 0.01
+weight_decay     = 0.0001
+epochs           = 200
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+metric_space     = Z
+
+Train NMI        = 0.366615
+Train AMI        = 0.356141
+Train ARI        = 0.218507
+Train FMI        = 0.577725
+Train Sil(Z)     = 0.587210
+Train DB(Z)      = 0.582401
+Train CH(Z)      = 335.548278
+Train ACC        = 0.514085
+
+Test NMI         = 0.737635
+Test AMI         = 0.728180
+Test ARI         = 0.568814
+Test FMI         = 0.768533
+Test Sil(Z)      = 0.927439
+Test DB(Z)       = 0.093450
+Test CH(Z)       = 1581.427616
+Test ACC         = 0.722222

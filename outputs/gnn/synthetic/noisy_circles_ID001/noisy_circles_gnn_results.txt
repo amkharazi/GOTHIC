@@ -1,0 +1,37 @@
+dataset          = noisy_circles
+model            = gnn
+run_id           = noisy_circles_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 2
+
+knn_k            = 10
+hidden_dim       = 64
+embed_dim        = 16
+dropout          = 0.1
+lr               = 0.01
+weight_decay     = 0.0001
+epochs           = 200
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+metric_space     = Z
+
+Train NMI        = 0.006056
+Train AMI        = 0.005574
+Train ARI        = 0.005891
+Train FMI        = 0.545707
+Train Sil(Z)     = 0.226354
+Train DB(Z)      = 1.615259
+Train CH(Z)      = 390.743391
+Train ACC        = 0.540000
+
+Test NMI         = 0.004825
+Test AMI         = 0.002936
+Test ARI         = 0.003425
+Test FMI         = 0.529358
+Test Sil(Z)      = 0.212697
+Test DB(Z)       = 1.749417
+Test CH(Z)       = 89.286807
+Test ACC         = 0.537500

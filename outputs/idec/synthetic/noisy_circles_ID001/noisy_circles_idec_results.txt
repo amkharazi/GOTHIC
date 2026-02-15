@@ -1,0 +1,38 @@
+dataset          = noisy_circles
+model            = idec
+run_id           = noisy_circles_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 2
+
+latent_dim       = 16
+hidden_dim       = 128
+dropout          = 0.0
+batch_size       = 256
+pretrain_epochs  = 100
+finetune_epochs  = 200
+lr               = 0.001
+weight_decay     = 0.0
+alpha            = 1.0
+gamma            = 1.0
+update_interval  = 10
+
+Train NMI        = 0.000407
+Train AMI        = -0.000044
+Train ARI        = -0.000061
+Train FMI        = 0.499829
+Train Sil(Z)     = 0.885722
+Train DB(Z)      = 0.146662
+Train CH(Z)      = 33146.286713
+Train ACC        = 0.511875
+
+Test NMI         = 0.004637
+Test AMI         = 0.002831
+Test ARI         = 0.003910
+Test FMI         = 0.501330
+Test Sil(Z)      = 0.812287
+Test DB(Z)       = 0.241315
+Test CH(Z)       = 3574.862584
+Test ACC         = 0.540000

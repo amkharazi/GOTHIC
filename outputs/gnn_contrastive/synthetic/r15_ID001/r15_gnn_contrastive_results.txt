@@ -1,0 +1,40 @@
+dataset          = r15
+model            = gnn_contrastive
+run_id           = r15_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 15
+
+knn_k            = 10
+hidden_dim       = 128
+embed_dim        = 64
+dropout          = 0.1
+epochs           = 300
+lr               = 0.001
+weight_decay     = 0.0001
+temperature      = 0.2
+edge_drop        = 0.2
+feat_drop        = 0.2
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+metric_space     = Z
+
+Train NMI        = 0.895089
+Train AMI        = 0.885106
+Train ARI        = 0.793886
+Train FMI        = 0.808316
+Train Sil(Z)     = 0.583397
+Train DB(Z)      = 0.571469
+Train CH(Z)      = 2565.967287
+Train ACC        = 0.860417
+
+Test NMI         = 0.782281
+Test AMI         = 0.703255
+Test ARI         = 0.515376
+Test FMI         = 0.570545
+Test Sil(Z)      = 0.449964
+Test DB(Z)       = 0.722786
+Test CH(Z)       = 117.020260
+Test ACC         = 0.591667

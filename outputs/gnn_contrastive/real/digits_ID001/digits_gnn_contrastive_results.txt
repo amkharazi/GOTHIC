@@ -1,0 +1,40 @@
+dataset          = digits
+model            = gnn_contrastive
+run_id           = digits_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 10
+
+knn_k            = 10
+hidden_dim       = 128
+embed_dim        = 64
+dropout          = 0.1
+epochs           = 300
+lr               = 0.001
+weight_decay     = 0.0001
+temperature      = 0.2
+edge_drop        = 0.2
+feat_drop        = 0.2
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+metric_space     = Z
+
+Train NMI        = 0.182091
+Train AMI        = 0.167954
+Train ARI        = 0.021729
+Train FMI        = 0.210290
+Train Sil(Z)     = 0.080016
+Train DB(Z)      = 2.144377
+Train CH(Z)      = 53.750170
+Train ACC        = 0.194715
+
+Test NMI         = 0.198810
+Test AMI         = 0.181226
+Test ARI         = 0.066877
+Test FMI         = 0.288935
+Test Sil(Z)      = 0.044778
+Test DB(Z)       = 2.623367
+Test CH(Z)       = 14.125577
+Test ACC         = 0.253482

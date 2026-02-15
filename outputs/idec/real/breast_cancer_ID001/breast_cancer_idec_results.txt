@@ -1,0 +1,38 @@
+dataset          = breast_cancer
+model            = idec
+run_id           = breast_cancer_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 2
+
+latent_dim       = 16
+hidden_dim       = 128
+dropout          = 0.0
+batch_size       = 256
+pretrain_epochs  = 100
+finetune_epochs  = 200
+lr               = 0.001
+weight_decay     = 0.0
+alpha            = 1.0
+gamma            = 1.0
+update_interval  = 10
+
+Train NMI        = 0.490947
+Train AMI        = 0.490022
+Train ARI        = 0.527729
+Train FMI        = 0.803100
+Train Sil(Z)     = 0.680462
+Train DB(Z)      = 0.511622
+Train CH(Z)      = 1021.344437
+Train ACC        = 0.866228
+
+Test NMI         = 0.163222
+Test AMI         = 0.154257
+Test ARI         = 0.113625
+Test FMI         = 0.717355
+Test Sil(Z)      = 0.704351
+Test DB(Z)       = 0.380953
+Test CH(Z)       = 138.386378
+Test ACC         = 0.699115

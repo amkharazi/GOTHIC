@@ -1,0 +1,28 @@
+dataset          = olivetti_faces
+run_id           = olivetti_faces_ID001
+seed             = 42
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 40
+affinity         = rbf
+gamma            = 1.0
+n_neighbors      = 10
+assign_labels    = kmeans
+
+Train NMI        = 0.536400
+Train AMI        = 0.325710
+Train ARI        = 0.055536
+Train FMI        = 0.170155
+Train Silhouette = -0.084663
+Train DB         = 1.859228
+Train CH         = 2.982108
+Train ACC        = 0.281250
+
+Test NMI         = 0.678729
+Test AMI         = 0.296813
+Test ARI         = 0.067619
+Test FMI         = 0.192254
+Test Silhouette  = 0.001366
+Test DB          = 1.485982
+Test CH          = 2.311516
+Test ACC         = 0.375000

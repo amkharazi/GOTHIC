@@ -1,0 +1,37 @@
+dataset          = flame
+model            = gnn
+run_id           = flame_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 2
+
+knn_k            = 10
+hidden_dim       = 64
+embed_dim        = 16
+dropout          = 0.1
+lr               = 0.01
+weight_decay     = 0.0001
+epochs           = 200
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+metric_space     = Z
+
+Train NMI        = 0.230565
+Train AMI        = 0.227358
+Train ARI        = 0.083371
+Train FMI        = 0.591973
+Train Sil(Z)     = 0.508569
+Train DB(Z)      = 0.714816
+Train CH(Z)      = 155.172646
+Train ACC        = 0.656250
+
+Test NMI         = 0.181868
+Test AMI         = 0.165799
+Test ARI         = -0.027306
+Test FMI         = 0.583161
+Test Sil(Z)      = 0.393692
+Test DB(Z)       = 0.560288
+Test CH(Z)       = 36.143811
+Test ACC         = 0.562500

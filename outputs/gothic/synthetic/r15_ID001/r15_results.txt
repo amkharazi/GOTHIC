@@ -3,9 +3,28 @@ run_id           = r15_ID001
 seed             = 42
 split_strategy   = balanced
 train_fraction   = 0.8
+
+reduce_dim       = none
+pca_trigger_dim  = 100
+pca_dim          = 64
+max_density_dim  = 64
+used_dim         = 2
+
 n_micro          = 45
 k_target         = 15
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
 dist_quantile    = 0.3
+dist_thresh      = 4.172434329986572
+b_boundary       = 5
+
+d_model          = 32
+n_heads          = 4
+attn_hidden      = 64
+n_transformer_layers = 2
+train_epochs     = 2000
+lr               = 0.001
+weight_decay     = 0.0001
 
 Train NMI        = 0.993129
 Train AMI        = 0.992476
@@ -13,7 +32,7 @@ Train ARI        = 0.990947
 Train FMI        = 0.991533
 Train Silhouette = 0.723668
 Train DB         = 0.356473
-Train CH         = 3257.947017
+Train CH         = 3257.947261
 Train ACC        = 0.995833
 
 Test NMI         = 1.000000
@@ -22,5 +41,5 @@ Test ARI         = 1.000000
 Test FMI         = 1.000000
 Test Silhouette  = 0.924281
 Test DB          = 0.111686
-Test CH          = 7764.452152
+Test CH          = 7764.452298
 Test ACC         = 1.000000

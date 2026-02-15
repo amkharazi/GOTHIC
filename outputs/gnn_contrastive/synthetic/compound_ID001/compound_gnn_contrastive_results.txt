@@ -1,0 +1,40 @@
+dataset          = compound
+model            = gnn_contrastive
+run_id           = compound_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 6
+
+knn_k            = 10
+hidden_dim       = 128
+embed_dim        = 64
+dropout          = 0.1
+epochs           = 300
+lr               = 0.001
+weight_decay     = 0.0001
+temperature      = 0.2
+edge_drop        = 0.2
+feat_drop        = 0.2
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+metric_space     = Z
+
+Train NMI        = 0.601265
+Train AMI        = 0.590874
+Train ARI        = 0.383423
+Train FMI        = 0.519139
+Train Sil(Z)     = 0.506269
+Train DB(Z)      = 0.623515
+Train CH(Z)      = 634.089910
+Train ACC        = 0.617555
+
+Test NMI         = 0.765547
+Test AMI         = 0.736334
+Test ARI         = 0.720150
+Test FMI         = 0.789099
+Test Sil(Z)      = 0.523277
+Test DB(Z)       = 0.639304
+Test CH(Z)       = 231.393577
+Test ACC         = 0.812500

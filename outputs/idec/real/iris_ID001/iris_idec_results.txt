@@ -1,0 +1,38 @@
+dataset          = iris
+model            = idec
+run_id           = iris_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 3
+
+latent_dim       = 16
+hidden_dim       = 128
+dropout          = 0.0
+batch_size       = 256
+pretrain_epochs  = 100
+finetune_epochs  = 200
+lr               = 0.001
+weight_decay     = 0.0
+alpha            = 1.0
+gamma            = 1.0
+update_interval  = 10
+
+Train NMI        = 0.858835
+Train AMI        = 0.856609
+Train ARI        = 0.880822
+Train FMI        = 0.919889
+Train Sil(Z)     = 0.625172
+Train DB(Z)      = 0.531434
+Train CH(Z)      = 692.255841
+Train ACC        = 0.958333
+
+Test NMI         = 1.000000
+Test AMI         = 1.000000
+Test ARI         = 1.000000
+Test FMI         = 1.000000
+Test Sil(Z)      = 0.804571
+Test DB(Z)       = 0.262209
+Test CH(Z)       = 530.389065
+Test ACC         = 1.000000

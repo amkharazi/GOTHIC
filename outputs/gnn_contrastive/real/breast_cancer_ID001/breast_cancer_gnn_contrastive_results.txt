@@ -1,0 +1,40 @@
+dataset          = breast_cancer
+model            = gnn_contrastive
+run_id           = breast_cancer_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 2
+
+knn_k            = 10
+hidden_dim       = 128
+embed_dim        = 64
+dropout          = 0.1
+epochs           = 300
+lr               = 0.001
+weight_decay     = 0.0001
+temperature      = 0.2
+edge_drop        = 0.2
+feat_drop        = 0.2
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+metric_space     = Z
+
+Train NMI        = 0.380893
+Train AMI        = 0.379686
+Train ARI        = 0.365049
+Train FMI        = 0.756246
+Train Sil(Z)     = 0.676603
+Train DB(Z)      = 0.608030
+Train CH(Z)      = 780.853427
+Train ACC        = 0.809211
+
+Test NMI         = 0.000000
+Test AMI         = 0.000000
+Test ARI         = 0.000000
+Test FMI         = 0.727160
+Test Sil(Z)      = nan
+Test DB(Z)       = nan
+Test CH(Z)       = nan
+Test ACC         = 0.628319

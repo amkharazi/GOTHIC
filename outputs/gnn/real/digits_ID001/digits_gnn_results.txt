@@ -1,0 +1,37 @@
+dataset          = digits
+model            = gnn
+run_id           = digits_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 10
+
+knn_k            = 10
+hidden_dim       = 64
+embed_dim        = 16
+dropout          = 0.1
+lr               = 0.01
+weight_decay     = 0.0001
+epochs           = 200
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+metric_space     = Z
+
+Train NMI        = 0.791333
+Train AMI        = 0.788668
+Train ARI        = 0.691147
+Train FMI        = 0.724746
+Train Sil(Z)     = 0.452739
+Train DB(Z)      = 0.823519
+Train CH(Z)      = 598.250291
+Train ACC        = 0.763561
+
+Test NMI         = 0.912058
+Test AMI         = 0.907548
+Test ARI         = 0.813846
+Test FMI         = 0.838010
+Test Sil(Z)      = 0.662804
+Test DB(Z)       = 0.560662
+Test CH(Z)       = 365.180386
+Test ACC         = 0.857939

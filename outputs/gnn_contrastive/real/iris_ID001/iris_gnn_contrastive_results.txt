@@ -1,0 +1,40 @@
+dataset          = iris
+model            = gnn_contrastive
+run_id           = iris_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 3
+
+knn_k            = 10
+hidden_dim       = 128
+embed_dim        = 64
+dropout          = 0.1
+epochs           = 300
+lr               = 0.001
+weight_decay     = 0.0001
+temperature      = 0.2
+edge_drop        = 0.2
+feat_drop        = 0.2
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+metric_space     = Z
+
+Train NMI        = 0.904193
+Train AMI        = 0.902682
+Train ARI        = 0.926587
+Train FMI        = 0.950652
+Train Sil(Z)     = 0.724682
+Train DB(Z)      = 0.369231
+Train CH(Z)      = 2162.919259
+Train ACC        = 0.975000
+
+Test NMI         = 0.705508
+Test AMI         = 0.684003
+Test ARI         = 0.715949
+Test FMI         = 0.804434
+Test Sil(Z)      = 0.823457
+Test DB(Z)       = 0.248054
+Test CH(Z)       = 607.625671
+Test ACC         = 0.900000

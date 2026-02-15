@@ -1,0 +1,38 @@
+dataset          = jain
+model            = idec
+run_id           = jain_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 2
+
+latent_dim       = 16
+hidden_dim       = 128
+dropout          = 0.0
+batch_size       = 256
+pretrain_epochs  = 100
+finetune_epochs  = 200
+lr               = 0.001
+weight_decay     = 0.0
+alpha            = 1.0
+gamma            = 1.0
+update_interval  = 10
+
+Train NMI        = 0.328296
+Train AMI        = 0.326503
+Train ARI        = 0.213506
+Train FMI        = 0.650041
+Train Sil(Z)     = 0.572553
+Train DB(Z)      = 0.613418
+Train CH(Z)      = 603.313707
+Train ACC        = 0.732441
+
+Test NMI         = 0.285264
+Test AMI         = 0.277230
+Test ARI         = 0.130486
+Test FMI         = 0.613716
+Test Sil(Z)      = 0.520485
+Test DB(Z)       = 0.631646
+Test CH(Z)       = 127.970302
+Test ACC         = 0.689189

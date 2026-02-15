@@ -1,0 +1,38 @@
+dataset          = wine
+model            = idec
+run_id           = wine_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 3
+
+latent_dim       = 16
+hidden_dim       = 128
+dropout          = 0.0
+batch_size       = 256
+pretrain_epochs  = 100
+finetune_epochs  = 200
+lr               = 0.001
+weight_decay     = 0.0
+alpha            = 1.0
+gamma            = 1.0
+update_interval  = 10
+
+Train NMI        = 0.392654
+Train AMI        = 0.384301
+Train ARI        = 0.293496
+Train FMI        = 0.542303
+Train Sil(Z)     = 0.538881
+Train DB(Z)      = 0.564708
+Train CH(Z)      = 392.581857
+Train ACC        = 0.598592
+
+Test NMI         = 0.614182
+Test AMI         = 0.587883
+Test ARI         = 0.511889
+Test FMI         = 0.695869
+Test Sil(Z)      = 0.503118
+Test DB(Z)       = 0.761814
+Test CH(Z)       = 123.237364
+Test ACC         = 0.750000

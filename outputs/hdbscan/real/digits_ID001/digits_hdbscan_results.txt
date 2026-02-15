@@ -1,0 +1,27 @@
+dataset                = digits
+run_id                 = digits_ID001
+seed                   = 42
+split_strategy         = balanced
+train_fraction         = 0.8
+min_cluster_size       = 5
+min_samples            = 5
+cluster_selection_eps  = 0.0
+cluster_selection_meth = eom
+
+Train NMI              = 0.673511
+Train AMI              = 0.667564
+Train ARI              = 0.363479
+Train FMI              = 0.461538
+Train Silhouette       = 0.048871
+Train DB               = 2.104219
+Train CH               = 66.389000
+Train ACC              = 0.646732
+
+Test NMI               = 0.786897
+Test AMI               = 0.774193
+Test ARI               = 0.578003
+Test FMI               = 0.638360
+Test Silhouette        = 0.164434
+Test DB                = 1.632834
+Test CH                = 39.071363
+Test ACC               = 0.710306

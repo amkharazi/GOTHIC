@@ -3,16 +3,35 @@ run_id           = noisy_circles_ID001
 seed             = 42
 split_strategy   = balanced
 train_fraction   = 0.8
+
+reduce_dim       = none
+pca_trigger_dim  = 100
+pca_dim          = 64
+max_density_dim  = 64
+used_dim         = 2
+
 n_micro          = 100
 k_target         = 2
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
 dist_quantile    = 0.3
+dist_thresh      = 0.7681832909584045
+b_boundary       = 5
+
+d_model          = 32
+n_heads          = 4
+attn_hidden      = 64
+n_transformer_layers = 2
+train_epochs     = 2000
+lr               = 0.001
+weight_decay     = 0.0001
 
 Train NMI        = 0.919319
 Train AMI        = 0.919282
 Train ARI        = 0.960375
 Train FMI        = 0.980175
 Train Silhouette = 0.106161
-Train DB         = 50.622816
+Train DB         = 50.622675
 Train CH         = 0.553443
 Train ACC        = 0.990000
 
@@ -21,6 +40,6 @@ Test AMI         = 1.000000
 Test ARI         = 1.000000
 Test FMI         = 1.000000
 Test Silhouette  = 0.125655
-Test DB          = 13.346292
+Test DB          = 13.346295
 Test CH          = 1.981681
 Test ACC         = 1.000000

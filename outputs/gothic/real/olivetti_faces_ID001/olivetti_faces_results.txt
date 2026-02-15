@@ -1,0 +1,45 @@
+dataset          = olivetti_faces
+run_id           = olivetti_faces_ID001
+seed             = 42
+split_strategy   = balanced
+train_fraction   = 0.8
+
+reduce_dim       = pca
+pca_trigger_dim  = 100
+pca_dim          = 128
+max_density_dim  = 64
+used_dim         = 128
+
+n_micro          = 120
+k_target         = 40
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+dist_quantile    = 0.4
+dist_thresh      = 10.998515129089355
+b_boundary       = 5
+
+d_model          = 32
+n_heads          = 4
+attn_hidden      = 64
+n_transformer_layers = 4
+train_epochs     = 2000
+lr               = 0.001
+weight_decay     = 0.0001
+
+Train NMI        = 0.886377
+Train AMI        = 0.797857
+Train ARI        = 0.587100
+Train FMI        = 0.617238
+Train Silhouette = 0.071894
+Train DB         = 1.903634
+Train CH         = 9.242992
+Train ACC        = 0.778125
+
+Test NMI         = 0.933154
+Test AMI         = 0.724064
+Test ARI         = 0.455084
+Test FMI         = 0.536288
+Test Silhouette  = 0.298761
+Test DB          = 1.238970
+Test CH          = 5.387534
+Test ACC         = 0.800000

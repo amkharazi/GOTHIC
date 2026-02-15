@@ -1,0 +1,38 @@
+dataset          = flame
+model            = idec
+run_id           = flame_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 2
+
+latent_dim       = 16
+hidden_dim       = 128
+dropout          = 0.0
+batch_size       = 256
+pretrain_epochs  = 100
+finetune_epochs  = 200
+lr               = 0.001
+weight_decay     = 0.0
+alpha            = 1.0
+gamma            = 1.0
+update_interval  = 10
+
+Train NMI        = 0.240480
+Train AMI        = 0.237430
+Train ARI        = 0.157033
+Train FMI        = 0.606215
+Train Sil(Z)     = 0.435551
+Train DB(Z)      = 0.877799
+Train CH(Z)      = 182.078767
+Train ACC        = 0.703125
+
+Test NMI         = 0.603646
+Test AMI         = 0.597146
+Test ARI         = 0.619149
+Test FMI         = 0.814791
+Test Sil(Z)      = 0.538404
+Test DB(Z)       = 0.677111
+Test CH(Z)       = 66.805057
+Test ACC         = 0.895833

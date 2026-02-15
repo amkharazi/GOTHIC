@@ -1,0 +1,28 @@
+dataset          = iris
+run_id           = iris_ID001
+seed             = 42
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 3
+affinity         = rbf
+gamma            = 1.0
+n_neighbors      = 10
+assign_labels    = kmeans
+
+Train NMI        = 0.717323
+Train AMI        = 0.712486
+Train ARI        = 0.590963
+Train FMI        = 0.746006
+Train Silhouette = 0.534595
+Train DB         = 0.617057
+Train CH         = 347.439863
+Train ACC        = 0.791667
+
+Test NMI         = 0.708699
+Test AMI         = 0.683349
+Test ARI         = 0.555649
+Test FMI         = 0.723318
+Test Silhouette  = 0.506165
+Test DB          = 0.515116
+Test CH          = 109.587364
+Test ACC         = 0.766667

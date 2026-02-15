@@ -1,0 +1,45 @@
+dataset          = wine
+run_id           = wine_abl_n_micro_20_seed42
+seed             = 42
+split_strategy   = balanced
+train_fraction   = 0.8
+
+reduce_dim       = none
+pca_trigger_dim  = 100
+pca_dim          = 64
+max_density_dim  = 64
+used_dim         = 13
+
+n_micro          = 20
+k_target         = 3
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+dist_quantile    = 0.6
+dist_thresh      = 488.5111083984375
+b_boundary       = 5
+
+d_model          = 128
+n_heads          = 2
+attn_hidden      = 64
+n_transformer_layers = 3
+train_epochs     = 2000
+lr               = 0.003
+weight_decay     = 0.001
+
+Train NMI        = 0.343695
+Train AMI        = 0.334884
+Train ARI        = 0.369390
+Train FMI        = 0.582050
+Train Silhouette = 0.261243
+Train DB         = 0.925957
+Train CH         = 155.090087
+Train ACC        = 0.711268
+
+Test NMI         = 0.718716
+Test AMI         = 0.698720
+Test ARI         = 0.573372
+Test FMI         = 0.760302
+Test Silhouette  = 0.307118
+Test DB          = 0.539924
+Test CH          = 140.105068
+Test ACC         = 0.750000

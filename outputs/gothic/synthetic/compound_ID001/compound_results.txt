@@ -3,17 +3,36 @@ run_id           = compound_ID001
 seed             = 42
 split_strategy   = balanced
 train_fraction   = 0.8
+
+reduce_dim       = none
+pca_trigger_dim  = 100
+pca_dim          = 64
+max_density_dim  = 64
+used_dim         = 2
+
 n_micro          = 91
 k_target         = 6
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
 dist_quantile    = 0.3
+dist_thresh      = 9.204446792602539
+b_boundary       = 5
+
+d_model          = 32
+n_heads          = 4
+attn_hidden      = 64
+n_transformer_layers = 2
+train_epochs     = 2000
+lr               = 0.001
+weight_decay     = 0.0001
 
 Train NMI        = 0.980989
 Train AMI        = 0.980459
 Train ARI        = 0.990559
 Train FMI        = 0.992889
 Train Silhouette = 0.153914
-Train DB         = 4.262340
-Train CH         = 394.711974
+Train DB         = 4.262335
+Train CH         = 394.711971
 Train ACC        = 0.993730
 
 Test NMI         = 1.000000
@@ -22,5 +41,5 @@ Test ARI         = 1.000000
 Test FMI         = 1.000000
 Test Silhouette  = 0.340074
 Test DB          = 1.554670
-Test CH          = 132.953512
+Test CH          = 132.953519
 Test ACC         = 1.000000

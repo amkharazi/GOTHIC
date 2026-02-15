@@ -1,0 +1,38 @@
+dataset          = aggregation
+model            = idec
+run_id           = aggregation_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 7
+
+latent_dim       = 16
+hidden_dim       = 128
+dropout          = 0.0
+batch_size       = 256
+pretrain_epochs  = 100
+finetune_epochs  = 200
+lr               = 0.001
+weight_decay     = 0.0
+alpha            = 1.0
+gamma            = 1.0
+update_interval  = 10
+
+Train NMI        = 0.814090
+Train AMI        = 0.810924
+Train ARI        = 0.655141
+Train FMI        = 0.726991
+Train Sil(Z)     = 0.499613
+Train DB(Z)      = 0.674174
+Train CH(Z)      = 1269.513557
+Train ACC        = 0.755556
+
+Test NMI         = 0.886304
+Test AMI         = 0.877377
+Test ARI         = 0.777458
+Test FMI         = 0.825330
+Test Sil(Z)      = 0.557193
+Test DB(Z)       = 0.658183
+Test CH(Z)       = 448.241986
+Test ACC         = 0.879747

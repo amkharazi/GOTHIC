@@ -1,0 +1,40 @@
+dataset          = pathbased
+model            = gnn_contrastive
+run_id           = pathbased_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 3
+
+knn_k            = 10
+hidden_dim       = 128
+embed_dim        = 64
+dropout          = 0.1
+epochs           = 300
+lr               = 0.001
+weight_decay     = 0.0001
+temperature      = 0.2
+edge_drop        = 0.2
+feat_drop        = 0.2
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+metric_space     = Z
+
+Train NMI        = 0.199467
+Train AMI        = 0.193055
+Train ARI        = 0.099216
+Train FMI        = 0.418128
+Train Sil(Z)     = 0.450089
+Train DB(Z)      = 0.800001
+Train CH(Z)      = 242.007065
+Train ACC        = 0.450000
+
+Test NMI         = 0.445613
+Test AMI         = 0.426887
+Test ARI         = 0.363839
+Test FMI         = 0.577057
+Test Sil(Z)      = 0.377568
+Test DB(Z)       = 0.702526
+Test CH(Z)       = 85.604751
+Test ACC         = 0.700000

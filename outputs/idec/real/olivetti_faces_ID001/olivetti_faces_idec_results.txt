@@ -1,0 +1,38 @@
+dataset          = olivetti_faces
+model            = idec
+run_id           = olivetti_faces_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 40
+
+latent_dim       = 16
+hidden_dim       = 128
+dropout          = 0.0
+batch_size       = 256
+pretrain_epochs  = 100
+finetune_epochs  = 200
+lr               = 0.001
+weight_decay     = 0.0
+alpha            = 1.0
+gamma            = 1.0
+update_interval  = 10
+
+Train NMI        = 0.516677
+Train AMI        = 0.174613
+Train ARI        = 0.068987
+Train FMI        = 0.103003
+Train Sil(Z)     = 0.172519
+Train DB(Z)      = 1.164926
+Train CH(Z)      = 253.136330
+Train ACC        = 0.243750
+
+Test NMI         = 0.820440
+Test AMI         = 0.229946
+Test ARI         = 0.181133
+Test FMI         = 0.208263
+Test Sil(Z)      = 0.192235
+Test DB(Z)       = 0.715767
+Test CH(Z)       = 87.512854
+Test ACC         = 0.537500

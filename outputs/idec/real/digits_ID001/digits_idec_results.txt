@@ -1,0 +1,38 @@
+dataset          = digits
+model            = idec
+run_id           = digits_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 10
+
+latent_dim       = 16
+hidden_dim       = 128
+dropout          = 0.0
+batch_size       = 256
+pretrain_epochs  = 100
+finetune_epochs  = 200
+lr               = 0.001
+weight_decay     = 0.0
+alpha            = 1.0
+gamma            = 1.0
+update_interval  = 10
+
+Train NMI        = 0.677857
+Train AMI        = 0.673733
+Train ARI        = 0.539270
+Train FMI        = 0.590465
+Train Sil(Z)     = 0.240226
+Train DB(Z)      = 1.483424
+Train CH(Z)      = 273.586537
+Train ACC        = 0.673853
+
+Test NMI         = 0.809492
+Test AMI         = 0.798203
+Test ARI         = 0.608727
+Test FMI         = 0.665612
+Test Sil(Z)      = 0.391385
+Test DB(Z)       = 1.054027
+Test CH(Z)       = 123.500002
+Test ACC         = 0.724234

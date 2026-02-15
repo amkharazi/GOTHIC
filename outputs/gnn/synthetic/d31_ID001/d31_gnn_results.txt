@@ -1,0 +1,37 @@
+dataset          = d31
+model            = gnn
+run_id           = d31_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 31
+
+knn_k            = 10
+hidden_dim       = 64
+embed_dim        = 16
+dropout          = 0.1
+lr               = 0.01
+weight_decay     = 0.0001
+epochs           = 200
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+metric_space     = Z
+
+Train NMI        = 0.774056
+Train AMI        = 0.759726
+Train ARI        = 0.495482
+Train FMI        = 0.513106
+Train Sil(Z)     = 0.412766
+Train DB(Z)      = 0.776282
+Train CH(Z)      = 3812.895285
+Train ACC        = 0.569758
+
+Test NMI         = 0.864300
+Test AMI         = 0.825666
+Test ARI         = 0.646474
+Test FMI         = 0.661939
+Test Sil(Z)      = 0.410110
+Test DB(Z)       = 1.010948
+Test CH(Z)       = 1122.836171
+Test ACC         = 0.714516

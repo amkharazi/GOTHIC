@@ -1,0 +1,40 @@
+dataset          = flame
+model            = gnn_contrastive
+run_id           = flame_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 2
+
+knn_k            = 10
+hidden_dim       = 128
+embed_dim        = 64
+dropout          = 0.1
+epochs           = 300
+lr               = 0.001
+weight_decay     = 0.0001
+temperature      = 0.2
+edge_drop        = 0.2
+feat_drop        = 0.2
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+metric_space     = Z
+
+Train NMI        = 0.235598
+Train AMI        = 0.232423
+Train ARI        = 0.090610
+Train FMI        = 0.593395
+Train Sil(Z)     = 0.604699
+Train DB(Z)      = 0.520335
+Train CH(Z)      = 344.325849
+Train ACC        = 0.661458
+
+Test NMI         = 0.253678
+Test AMI         = 0.240420
+Test ARI         = 0.055940
+Test FMI         = 0.579890
+Test Sil(Z)      = 0.470987
+Test DB(Z)       = 0.582341
+Test CH(Z)       = 60.461520
+Test ACC         = 0.645833

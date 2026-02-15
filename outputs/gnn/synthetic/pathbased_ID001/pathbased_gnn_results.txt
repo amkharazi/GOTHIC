@@ -1,0 +1,37 @@
+dataset          = pathbased
+model            = gnn
+run_id           = pathbased_ID001
+seed             = 42
+device           = cpu
+split_strategy   = balanced
+train_fraction   = 0.8
+k_target         = 3
+
+knn_k            = 10
+hidden_dim       = 64
+embed_dim        = 16
+dropout          = 0.1
+lr               = 0.01
+weight_decay     = 0.0001
+epochs           = 200
+kmeans_n_init    = 50
+kmeans_max_iter  = 500
+metric_space     = Z
+
+Train NMI        = 0.193441
+Train AMI        = 0.186945
+Train ARI        = 0.091171
+Train FMI        = 0.416684
+Train Sil(Z)     = 0.424495
+Train DB(Z)      = 0.894267
+Train CH(Z)      = 166.584449
+Train ACC        = 0.462500
+
+Test NMI         = 0.419116
+Test AMI         = 0.399063
+Test ARI         = 0.315761
+Test FMI         = 0.554871
+Test Sil(Z)      = 0.326462
+Test DB(Z)       = 0.885367
+Test CH(Z)       = 43.452486
+Test ACC         = 0.616667
