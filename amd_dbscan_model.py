@@ -4,6 +4,10 @@ amd_dbscan_model.py
 AMD-DBSCAN baseline (Adaptive Multi-Density DBSCAN-style clustering)
 implemented in the same style as GOTHIC / KMeans / DBSCAN / HDBSCAN.
 
+✅ UPDATE (CSV FIX):
+  - Appends a row to results_summary.csv (same robust header-expanding logic as spectral_model.py)
+  - Includes paths + key hyperparameters so the run is visible in the CSV.
+
 Idea:
   - Use a local scale per point based on its k-th nearest neighbor distance.
   - Define a scaled distance matrix:
@@ -20,7 +24,14 @@ Pipeline:
   4) Run DBSCAN(metric='precomputed') on D'_train -> y_pred_train.
   5) Assign test labels via 1-NN from train.
   6) Compute metrics + plots, save to out_dir/run_id/.
+  7) Append to results_summary.csv (cwd).
 """
+
+MODEL_NAME = "amd_dbscan"
+
+import csv
+import json
+from datetime import datetime
 
 import argparse
 from pathlib import Path
@@ -68,12 +79,7 @@ def parse_args(argv=None):
     parser = argparse.ArgumentParser(description="AMD-DBSCAN baseline for clustering.")
 
     # Core
-    parser.add_argument(
-        "--dataset",
-        type=str,
-        default=DEFAULT_DATASET,
-        help="Dataset name (synthetic or real) as defined in dataset/loader.",
-    )
+    parser.add_argument("--dataset", type=str, default=DEFAULT_DATASET)
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
     parser.add_argument("--train_fraction", type=float, default=DEFAULT_TRAIN_FRACTION)
     parser.add_argument(
@@ -83,53 +89,84 @@ def parse_args(argv=None):
         choices=["random", "balanced"],
         help="Train/test split strategy.",
     )
-    parser.add_argument(
-        "--data_root",
-        type=str,
-        default="datasets",
-        help="Base directory where datasets are stored.",
-    )
-    parser.add_argument(
-        "--out_dir",
-        type=str,
-        default="outputs",
-        help="Base directory to save results and plots.",
-    )
-    parser.add_argument(
-        "--run_id",
-        type=str,
-        default="amd_dbscan_default",
-        help="Run identifier; outputs go under out_dir/run_id/.",
-    )
+    parser.add_argument("--data_root", type=str, default="datasets")
+    parser.add_argument("--out_dir", type=str, default="outputs")
+    parser.add_argument("--run_id", type=str, default="amd_dbscan_default")
 
     # AMD-DBSCAN params
-    parser.add_argument(
-        "--eps",
-        type=float,
-        default=DEFAULT_AMD_EPS,
-        help="eps parameter for DBSCAN on the scaled distance matrix.",
-    )
-    parser.add_argument(
-        "--min_samples",
-        type=int,
-        default=DEFAULT_MIN_SAMPLES,
-        help="min_samples parameter for DBSCAN.",
-    )
-    parser.add_argument(
-        "--k_scale",
-        type=int,
-        default=DEFAULT_K_SCALE,
-        help="k for local scaling (distance to k-th neighbor).",
-    )
+    parser.add_argument("--eps", type=float, default=DEFAULT_AMD_EPS)
+    parser.add_argument("--min_samples", type=int, default=DEFAULT_MIN_SAMPLES)
+    parser.add_argument("--k_scale", type=int, default=DEFAULT_K_SCALE)
 
     # Misc
-    parser.add_argument(
-        "--show_plots",
-        action="store_true",
-        help="If set, show matplotlib figures interactively after saving.",
-    )
+    parser.add_argument("--show_plots", action="store_true")
 
     return parser.parse_args(argv)
+
+
+# =========================== CSV HELPERS ===========================
+
+def _to_csv_value(v):
+    if isinstance(v, (dict, list, tuple)):
+        return json.dumps(v, ensure_ascii=False)
+    if isinstance(v, (Path,)):
+        return str(v)
+    return v
+
+
+def append_row_to_csv(csv_path: Path, row: Dict[str, Any]) -> None:
+    """
+    Robust CSV appender:
+      - creates file if missing
+      - expands header if new keys appear
+    Same behavior as spectral_model.py.
+    """
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
+    row = {k: _to_csv_value(v) for k, v in row.items()}
+
+    if not csv_path.exists():
+        with open(csv_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=list(row.keys()))
+            writer.writeheader()
+            writer.writerow(row)
+        return
+
+    with open(csv_path, "r", newline="", encoding="utf-8") as f:
+        reader = csv.reader(f)
+        try:
+            header = next(reader)
+        except StopIteration:
+            header = []
+
+    if not header:
+        with open(csv_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=list(row.keys()))
+            writer.writeheader()
+            writer.writerow(row)
+        return
+
+    header_set = set(header)
+    missing = [k for k in row.keys() if k not in header_set]
+
+    if missing:
+        with open(csv_path, "r", newline="", encoding="utf-8") as f:
+            old_reader = csv.DictReader(f)
+            old_rows = list(old_reader)
+            old_fieldnames = old_reader.fieldnames or header
+
+        new_fieldnames = list(old_fieldnames) + missing
+
+        with open(csv_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=new_fieldnames)
+            writer.writeheader()
+            for r in old_rows:
+                writer.writerow({k: r.get(k, "") for k in new_fieldnames})
+            writer.writerow({k: row.get(k, "") for k in new_fieldnames})
+        return
+
+    with open(csv_path, "a", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=header)
+        writer.writerow({k: row.get(k, "") for k in header})
 
 
 # =========================== UTILITIES =============================
@@ -141,12 +178,6 @@ def train_test_split_with_strategy(
     strategy: str = "balanced",
     seed: int = 42,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """
-    Same behavior as in gothic_model/kmeans_model/dbscan_model/hdbscan_model:
-      - 'random'   : simple random split.
-      - 'balanced' : per-class, density-aware split (interior points to test,
-                     boundary points to train).
-    """
     rng = np.random.RandomState(seed)
     n = X.shape[0]
     indices = np.arange(n)
@@ -176,7 +207,6 @@ def train_test_split_with_strategy(
                 train_idx.extend(idx_c)
                 continue
 
-            # k-NN within cluster for density
             k_nn = min(10, n_c - 1)
             nn = NearestNeighbors(n_neighbors=k_nn + 1)
             nn.fit(X_c)
@@ -205,10 +235,11 @@ def train_test_split_with_strategy(
 
 
 def safe_cluster_metric(fn, X_data, labels_pred, name: str) -> float:
-    """
-    Compute an internal clustering metric, but handle edge cases gracefully.
-    """
     try:
+        if X_data is None or len(X_data) == 0:
+            return float("nan")
+        if labels_pred is None or len(labels_pred) == 0:
+            return float("nan")
         if len(np.unique(labels_pred)) < 2:
             return float("nan")
         return float(fn(X_data, labels_pred))
@@ -218,45 +249,33 @@ def safe_cluster_metric(fn, X_data, labels_pred, name: str) -> float:
 
 
 def compute_distance_matrix(X: np.ndarray) -> np.ndarray:
-    """
-    Full pairwise Euclidean distance matrix for X (n, d).
-    """
     sq = np.sum(X ** 2, axis=1, keepdims=True)
     D_sq = sq + sq.T - 2.0 * (X @ X.T)
     np.maximum(D_sq, 0.0, out=D_sq)
-    D = np.sqrt(D_sq)
-    return D
+    return np.sqrt(D_sq)
 
 
 def compute_local_scales(D: np.ndarray, k: int) -> np.ndarray:
-    """
-    Local scale per point: distance to its k-th nearest neighbor.
-    D is (n, n) distance matrix.
-    """
     n = D.shape[0]
     if n <= 1:
         return np.ones(n, dtype=float)
-    k_eff = min(k, max(1, n - 1))
-    order = np.argsort(D, axis=1)  # includes self at position 0
-    kth_idx = order[:, k_eff]      # k_eff-th neighbor
+
+    k_eff = min(int(k), max(1, n - 1))
+    order = np.argsort(D, axis=1)  # self at 0
+    kth_idx = order[:, k_eff]
     local_scales = D[np.arange(n), kth_idx]
-    # Avoid zeros
-    local_scales[local_scales <= 0.0] = np.median(local_scales[local_scales > 0.0]) if np.any(local_scales > 0.0) else 1.0
+
+    pos = local_scales[local_scales > 0.0]
+    fill = float(np.median(pos)) if pos.size else 1.0
+    local_scales[local_scales <= 0.0] = fill
     return local_scales
 
 
 def build_scaled_distance_matrix(D: np.ndarray, scales: np.ndarray) -> np.ndarray:
-    """
-    Build scaled distance matrix:
-      D'_{ij} = D_{ij} / max(scales[i], scales[j])
-    """
-    n = D.shape[0]
     S_i = scales.reshape(-1, 1)
     S_j = scales.reshape(1, -1)
     denom = np.maximum(S_i, S_j)
-    eps = 1e-12
-    D_scaled = D / (denom + eps)
-    return D_scaled
+    return D / (denom + 1e-12)
 
 
 # ============================= MAIN ================================
@@ -280,10 +299,11 @@ def amd_dbscan_main(args=None) -> Dict[str, Any]:
 
     # Load dataset
     X, y = load_dataset(dataset, base_dir=str(data_root))
+    y = y.astype(int)
     print(f"[INFO] Loaded dataset '{dataset}': X.shape={X.shape}, unique labels={np.unique(y)}")
 
     # Train/test split
-    X_train, X_test, y_train, y_test, train_idx, test_idx = train_test_split_with_strategy(
+    X_train, X_test, y_train, y_test, _, _ = train_test_split_with_strategy(
         X, y,
         train_frac=args.train_fraction,
         strategy=args.split_strategy,
@@ -308,44 +328,38 @@ def amd_dbscan_main(args=None) -> Dict[str, Any]:
         D_scaled = build_scaled_distance_matrix(D_train, scales)
 
         print(f"[INFO] Running DBSCAN on scaled distances (eps={args.eps}, min_samples={args.min_samples}) ...")
-        db = DBSCAN(
-            eps=args.eps,
-            min_samples=args.min_samples,
-            metric="precomputed",
-        )
-        db.fit(D_scaled)
-        y_pred_train = db.labels_  # includes -1 for noise
+        db = DBSCAN(eps=args.eps, min_samples=args.min_samples, metric="precomputed")
+        y_pred_train = db.fit_predict(D_scaled)  # includes -1 noise
 
         # Assign test labels via 1-NN in original space
         if len(X_test) > 0:
             nn = NearestNeighbors(n_neighbors=1)
             nn.fit(X_train)
-            dists_test, idx_test_nn = nn.kneighbors(X_test)
+            _, idx_test_nn = nn.kneighbors(X_test)
             idx_test_nn = idx_test_nn.squeeze(1)
             y_pred_test = y_pred_train[idx_test_nn]
         else:
             y_pred_test = np.array([], dtype=int)
 
     # ==================== METRICS =================================
+    # Guard against empty test for safety
+    has_test = len(y_test) > 0 and len(y_pred_test) > 0
 
-    # External metrics
-    nmi_train = normalized_mutual_info_score(y_train, y_pred_train)
-    nmi_test = normalized_mutual_info_score(y_test, y_pred_test)
+    nmi_train = normalized_mutual_info_score(y_train, y_pred_train) if len(y_train) else float("nan")
+    nmi_test = normalized_mutual_info_score(y_test, y_pred_test) if has_test else float("nan")
 
-    ami_train = adjusted_mutual_info_score(y_train, y_pred_train)
-    ami_test = adjusted_mutual_info_score(y_test, y_pred_test)
+    ami_train = adjusted_mutual_info_score(y_train, y_pred_train) if len(y_train) else float("nan")
+    ami_test = adjusted_mutual_info_score(y_test, y_pred_test) if has_test else float("nan")
 
-    ari_train = adjusted_rand_score(y_train, y_pred_train)
-    ari_test = adjusted_rand_score(y_test, y_pred_test)
+    ari_train = adjusted_rand_score(y_train, y_pred_train) if len(y_train) else float("nan")
+    ari_test = adjusted_rand_score(y_test, y_pred_test) if has_test else float("nan")
 
-    fmi_train = fowlkes_mallows_score(y_train, y_pred_train)
-    fmi_test = fowlkes_mallows_score(y_test, y_pred_test)
+    fmi_train = fowlkes_mallows_score(y_train, y_pred_train) if len(y_train) else float("nan")
+    fmi_test = fowlkes_mallows_score(y_test, y_pred_test) if has_test else float("nan")
 
-    # Accuracy with permutation
-    acc_train, map_train = clustering_accuracy_with_map(y_train, y_pred_train)
-    acc_test, map_test = clustering_accuracy_with_map(y_test, y_pred_test)
+    acc_train, map_train = clustering_accuracy_with_map(y_train, y_pred_train) if len(y_train) else (float("nan"), {})
+    acc_test, map_test = clustering_accuracy_with_map(y_test, y_pred_test) if has_test else (float("nan"), {})
 
-    # Internal metrics
     sil_train = safe_cluster_metric(silhouette_score, X_train, y_pred_train, "silhouette (train)")
     sil_test = safe_cluster_metric(silhouette_score, X_test, y_pred_test, "silhouette (test)")
 
@@ -364,133 +378,85 @@ def amd_dbscan_main(args=None) -> Dict[str, Any]:
     print(f"[RESULT] Test  Sil   = {sil_test:.4f}, DB  = {db_test_val:.4f}, CH  = {ch_test:.4f}")
 
     # Map test predictions for visualization
-    y_pred_test_mapped = apply_label_mapping(y_pred_test, map_test)
-    correct_test = (y_pred_test_mapped == y_test)
+    if has_test:
+        y_pred_test_mapped = apply_label_mapping(y_pred_test, map_test)
+        correct_test = (y_pred_test_mapped == y_test)
+    else:
+        correct_test = np.array([], dtype=bool)
 
     # ==================== PLOTS: TRAIN + TEST ======================
-
     fig, axes = plt.subplots(1, 3, figsize=(15, 4))
 
     # 2D coordinates for scatter plots
     if X_train.shape[1] >= 2:
-        train_x = X_train[:, 0]
-        train_y = X_train[:, 1]
-        test_x = X_test[:, 0]
-        test_y = X_test[:, 1]
+        train_x, train_y2 = X_train[:, 0], X_train[:, 1]
+        test_x, test_y2 = X_test[:, 0], X_test[:, 1] if len(X_test) else (np.array([]), np.array([]))
     elif X_train.shape[1] == 1:
-        train_x = X_train[:, 0]
-        train_y = np.zeros_like(train_x)
-        test_x = X_test[:, 0]
-        test_y = np.zeros_like(test_x)
+        train_x, train_y2 = X_train[:, 0], np.zeros_like(X_train[:, 0])
+        test_x = X_test[:, 0] if len(X_test) else np.array([])
+        test_y2 = np.zeros_like(test_x)
     else:
         raise ValueError("X must have at least 1 feature.")
 
-    # (a) Train ground truth
+    # (a) Train GT
     ax = axes[0]
-    ax.scatter(
-        train_x,
-        train_y,
-        c=y_train,
-        cmap="tab10",
-        s=20,
-        alpha=0.9,
-    )
+    ax.scatter(train_x, train_y2, c=y_train, cmap="tab10", s=20, alpha=0.9)
     ax.set_title("Train ground truth")
-    ax.set_xlabel("x")
-    ax.set_ylabel("y")
+    ax.set_xlabel("x"); ax.set_ylabel("y")
 
-    # (b) Train AMD-DBSCAN clusters
+    # (b) Train pred
     ax = axes[1]
-    ax.scatter(
-        train_x,
-        train_y,
-        c=y_pred_train,
-        cmap="tab10",
-        s=20,
-        alpha=0.9,
-    )
+    ax.scatter(train_x, train_y2, c=y_pred_train, cmap="tab10", s=20, alpha=0.9)
     ax.set_title(f"Train AMD-DBSCAN (NMI={nmi_train:.3f}, ACC={acc_train:.3f})")
-    ax.set_xlabel("x")
-    ax.set_ylabel("y")
+    ax.set_xlabel("x"); ax.set_ylabel("y")
 
-    # (c) Test: base points + correct + mis-clustered
+    # (c) Test correctness
     ax = axes[2]
-    ax.scatter(
-        test_x,
-        test_y,
-        c="blue",
-        s=20,
-        alpha=0.3,
-        label="Test points",
-    )
-    ax.scatter(
-        test_x[correct_test],
-        test_y[correct_test],
-        c="green",
-        s=20,
-        alpha=0.9,
-        label="Correct",
-    )
-    ax.scatter(
-        test_x[~correct_test],
-        test_y[~correct_test],
-        c="red",
-        s=30,
-        alpha=0.9,
-        marker="x",
-        label="Mis-clustered",
-    )
+    if len(X_test):
+        ax.scatter(test_x, test_y2, c="blue", s=20, alpha=0.3, label="Test points")
+        if has_test:
+            ax.scatter(test_x[correct_test], test_y2[correct_test], c="green", s=20, alpha=0.9, label="Correct")
+            ax.scatter(test_x[~correct_test], test_y2[~correct_test], c="red", s=30, alpha=0.9, marker="x", label="Mis-clustered")
+        ax.legend(loc="best", fontsize=8)
     ax.set_title(f"Test AMD-DBSCAN (NMI={nmi_test:.3f}, ACC={acc_test:.3f})")
-    ax.set_xlabel("x")
-    ax.set_ylabel("y")
-    ax.legend(loc="best", fontsize=8)
+    ax.set_xlabel("x"); ax.set_ylabel("y")
 
     fig.tight_layout()
     train_test_path = figures_dir / f"{dataset}_amd_dbscan_train_test.png"
     fig.savefig(train_test_path, dpi=150, transparent=True)
     print(f"[INFO] Saved AMD-DBSCAN train/test figure to: {train_test_path}")
     if args.show_plots:
-        fig.show()
+        plt.show()
     else:
         plt.close(fig)
 
-    # ========== EXTRA PLOT: FULL-DATASET GROUND TRUTH =============
-
+    # Full dataset GT plot
     try:
         if X.shape[1] >= 2:
-            full_x = X[:, 0]
-            full_y = X[:, 1]
+            full_x, full_y2 = X[:, 0], X[:, 1]
         elif X.shape[1] == 1:
-            full_x = X[:, 0]
-            full_y = np.zeros_like(full_x)
+            full_x, full_y2 = X[:, 0], np.zeros_like(X[:, 0])
         else:
             raise ValueError("X must have at least 1 feature for plotting.")
 
         fig_full, ax_full = plt.subplots(figsize=(6, 5))
-        ax_full.scatter(
-            full_x,
-            full_y,
-            c=y,
-            cmap="tab10",
-            s=15,
-            alpha=0.9,
-        )
+        ax_full.scatter(full_x, full_y2, c=y, cmap="tab10", s=15, alpha=0.9)
         ax_full.set_title("Full dataset ground truth")
-        ax_full.set_xlabel("x")
-        ax_full.set_ylabel("y")
+        ax_full.set_xlabel("x"); ax_full.set_ylabel("y")
         fig_full.tight_layout()
 
         full_gt_path = figures_dir / f"{dataset}_amd_dbscan_full_ground_truth.png"
         fig_full.savefig(full_gt_path, dpi=150, transparent=True)
         print(f"[INFO] Saved full dataset GT figure (AMD-DBSCAN run) to: {full_gt_path}")
         if args.show_plots:
-            fig_full.show()
+            plt.show()
         else:
             plt.close(fig_full)
     except Exception as e:
         print(f"[WARN] Failed to save full dataset ground-truth plot: {e}")
+        full_gt_path = ""
 
-    # ================ METRIC BAR PLOTS (individual) ==============
+    # Metric bar plots
     try:
         metric_values = {
             "NMI": (nmi_train, nmi_test),
@@ -511,18 +477,16 @@ def amd_dbscan_main(args=None) -> Dict[str, Any]:
             fig_m.tight_layout()
             metric_path = figures_dir / f"{dataset}_amd_dbscan_metric_{name.lower()}.png"
             fig_m.savefig(metric_path, dpi=150, transparent=True)
-            print(f"[INFO] Saved AMD-DBSCAN metric plot '{name}' to: {metric_path}")
             if args.show_plots:
-                fig_m.show()
+                plt.show()
             else:
                 plt.close(fig_m)
     except Exception as e:
         print(f"[WARN] Failed to save AMD-DBSCAN metric bar plots: {e}")
 
-    # ================ SAVE TEXT RESULTS / METRICS ==================
-
+    # Save scalar results
     results_txt_path = out_dir / f"{dataset}_amd_dbscan_results.txt"
-    with open(results_txt_path, "w") as f:
+    with open(results_txt_path, "w", encoding="utf-8") as f:
         f.write(f"dataset          = {dataset}\n")
         f.write(f"run_id           = {args.run_id}\n")
         f.write(f"seed             = {args.seed}\n")
@@ -552,6 +516,43 @@ def amd_dbscan_main(args=None) -> Dict[str, Any]:
 
     print(f"[INFO] Saved AMD-DBSCAN scalar results to: {results_txt_path}")
 
+    # ==================== APPEND SUMMARY CSV (FIX) ==================
+    summary_csv_path = Path.cwd() / "results_summary.csv"
+    row = {
+        "timestamp_utc": datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        "dataset": dataset,
+        "model": MODEL_NAME,
+        "run_id": args.run_id,
+        "seed": args.seed,
+        "split_strategy": args.split_strategy,
+        "train_fraction": args.train_fraction,
+        "eps": args.eps,
+        "min_samples": args.min_samples,
+        "k_scale": args.k_scale,
+        "train_nmi": nmi_train,
+        "train_ami": ami_train,
+        "train_ari": ari_train,
+        "train_fmi": fmi_train,
+        "train_sil": sil_train,
+        "train_db": db_train_val,
+        "train_ch": ch_train,
+        "train_acc": acc_train,
+        "test_nmi": nmi_test,
+        "test_ami": ami_test,
+        "test_ari": ari_test,
+        "test_fmi": fmi_test,
+        "test_sil": sil_test,
+        "test_db": db_test_val,
+        "test_ch": ch_test,
+        "test_acc": acc_test,
+        "results_txt": str(results_txt_path),
+        "figures_dir": str(figures_dir),
+        "train_test_png": str(train_test_path),
+        "full_gt_png": str(full_gt_path) if full_gt_path else "",
+    }
+    append_row_to_csv(summary_csv_path, row)
+    print(f"[INFO] Appended run summary to CSV: {summary_csv_path}")
+
     return {
         "dataset": dataset,
         "run_id": args.run_id,
@@ -562,6 +563,7 @@ def amd_dbscan_main(args=None) -> Dict[str, Any]:
         "results_txt": str(results_txt_path),
         "train_test_png": str(train_test_path),
         "figures_dir": str(figures_dir),
+        "summary_csv": str(summary_csv_path),
     }
 
 
