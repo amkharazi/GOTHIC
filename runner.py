@@ -10,14 +10,19 @@ Usage examples:
 
 Any arguments after `--model ...` are forwarded to the corresponding model script.
 
-Currently supported:
-  --model gothic     -> gothic_model.py
-  --model kmeans     -> kmeans_model.py
-  --model dbscan     -> dbscan_model.py
-  --model hdbscan    -> hdbscan_model.py
-  --model insdpc     -> insdpc_model.py
-  --model amd_dbscan -> amd_dbscan_model.py
-  --model mdbscan    -> mdbscan_model.py
+Supported models:
+  --model gothic          -> gothic_model.py
+  --model kmeans          -> kmeans_model.py
+  --model dbscan          -> dbscan_model.py
+  --model hdbscan         -> hdbscan_model.py
+  --model insdpc          -> insdpc_model.py
+  --model amd_dbscan      -> amd_dbscan_model.py
+  --model mdbscan         -> mdbscan_model.py
+
+  --model spectral        -> spectral_model.py
+  --model gnn             -> gnn_model.py
+  --model idec            -> idec_model.py
+  --model gnn_contrastive -> gnn_contrastive_model.py
 """
 
 import sys
@@ -39,25 +44,29 @@ def main():
 
     # Parse only --model, leave the rest to be forwarded
     args, remaining = parser.parse_known_args()
-
     model = args.model.lower()
 
-    if model == "gothic":
-        script = root / "gothic_model.py"
-    elif model == "kmeans":
-        script = root / "kmeans_model.py"
-    elif model == "dbscan":
-        script = root / "dbscan_model.py"
-    elif model == "hdbscan":
-        script = root / "hdbscan_model.py"
-    elif model == "insdpc":
-        script = root / "insdpc_model.py"
-    elif model == "amd_dbscan":
-        script = root / "amd_dbscan_model.py"
-    elif model == "mdbscan":
-        script = root / "mdbscan_model.py"
-    else:
-        raise ValueError(f"Unknown model '{model}'. Currently supported: gothic , kmeans, dbscan, hdbscan, insdpc, amd_dbscan, mdbscan ")
+    model_map = {
+        "gothic": "gothic_model.py",
+        "kmeans": "kmeans_model.py",
+        "dbscan": "dbscan_model.py",
+        "hdbscan": "hdbscan_model.py",
+        "insdpc": "insdpc_model.py",
+        "amd_dbscan": "amd_dbscan_model.py",
+        "mdbscan": "mdbscan_model.py",
+        "spectral": "spectral_model.py",
+        "gnn": "gnn_model.py",
+        "idec": "idec_model.py",
+        "gnn_contrastive": "gnn_contrastive_model.py",
+    }
+
+    if model not in model_map:
+        supported = ", ".join(sorted(model_map.keys()))
+        raise ValueError(f"Unknown model '{model}'. Currently supported: {supported}")
+
+    script = root / model_map[model]
+    if not script.exists():
+        raise FileNotFoundError(f"Model script not found: {script}")
 
     cmd = [sys.executable, str(script)] + remaining
 
