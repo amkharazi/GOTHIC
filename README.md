@@ -1,14 +1,19 @@
 # Fast Start
 
-Checkout `run.sh` for the runner scripts. 
+Checkout `run.sh` for ready-to-run benchmark commands.
 
-> For example, you can use this command to run the script on the *Compound* dataset with the GOTHIC model:
+> Example (Real dataset / **Wine** + **GOTHIC**):
 >
 > ```bash
-> python runner.py --model gothic --run_id compound_ID001 --dataset compound --seed 42 --train_fraction 0.8 --split_strategy balanced --n_micro 91 --kmeans_n_init 50 --kmeans_max_iter 500 --dist_quantile 0.3 --b_boundary 5 --d_model 32 --n_heads 4 --attn_hidden 64 --n_transformer_layers 2 --train_epochs 2000 --lr 0.001 --weight_decay 0.0001 --k_target 6 --data_root datasets --out_dir outputs
+> python runner.py --model gothic --run_id wine_ID001 --dataset wine --seed 42 --train_fraction 0.8 --split_strategy balanced --n_micro 5 --kmeans_n_init 50 --kmeans_max_iter 500 --dist_quantile 0.6 --b_boundary 5 --d_model 128 --n_heads 2 --attn_hidden 64 --n_transformer_layers 3 --train_epochs 2000 --lr 0.003 --weight_decay 0.001 --k_target 3 --data_root datasets --out_dir outputs/gothic/real
 > ```
 
-reminder: `"C:\Program Files\Git\usr\bin\bash.exe" -lc "cd /c/Git/GOTHIC && sed -i 's/\r$//' run.sh && bash run.sh"`
+Windows reminder (Git Bash):
+
+```text
+"C:\Program Files\Git\usr\bin\bash.exe" -lc "cd '/c/Users/Snapp! Pay/Desktop/GOTHIC/GOTHIC' && bash run.sh"
+```
+
 ---
 
 # GOTHIC: Graph-Overclustered Transformer-based Hierarchical Integrated Clustering
@@ -18,166 +23,47 @@ GOTHIC is an experimental clustering framework that combines:
 - **Over-clustering** (KMeans → many micro-clusters),
 - A **graph** over micro-clusters (edges based on centroid + boundary + density),
 - A **Transformer-based pair scorer** over that graph,
-- **Hierarchical merging** of micro-clusters guided by the learned pairwise scores.
+- **Hierarchical merging** of micro-clusters guided by learned pairwise scores.
 
-The acronym stands for:
+Acronym:
 
 > **G**raph-**O**verclustered **T**ransformer-based **H**ierarchical **I**ntegrated **C**lustering
 
-It’s designed to explore graph + neural approaches to clustering on both synthetic and real datasets, with a rich set of evaluation metrics and diagnostic plots.
+This repo also contains **baseline models** (classical + deep) so you can benchmark GOTHIC side-by-side on both synthetic and real datasets.
 
 ---
 
-## High-level idea
+## Supported models (`runner.py --model ...`)
 
-Given a dataset \(X \in \mathbb{R}^{N 	imes d}\) with labels \(y\) (used **only** for supervision at the micro-cluster level):
-
-1. **Over-cluster with KMeans**  
-   - Choose `n_micro` (e.g. 80 for Compound).  
-   - Run KMeans on the **train** subset only.  
-   - Each micro-cluster has:
-     - A centroid,
-     - Members and their distances to the centroid,
-     - A majority label (from `y_train`) for supervision,
-     - A set of **boundary points** (farthest members).
-
-2. **Build a micro-cluster graph**
-   - Nodes: micro-clusters.
-   - Edges: connect pairs of micro-clusters whose centroid distance is below a quantile threshold `dist_quantile` (e.g. 0.3).
-   - For each edge \((i, j)\), we compute **pairwise features**:
-     - `center_dist`: distance between centroids,
-     - `border_min_dist`: minimum distance between boundary points of the two micro-clusters,
-     - `log_density_diff`: absolute difference between log-densities,
-     - `log_density_i`, `log_density_j`: the (log) densities of the two micro-clusters themselves.
-
-3. **Node (micro-cluster) features**
-   - For each micro-cluster, we build a feature vector:
-     - Centroid coordinates (dimension \(d\)),
-     - `log_size = log(1 + |C_i|)`,
-     - `radius_mean`,
-     - `radius_std`,
-     - `log_density` (size divided by a simple volume proxy, then log).
-   - These density-aware features are what the Transformer sees as node inputs.
-
-4. **Transformer-based pair scorer**
-   - A small Transformer encoder is applied to all node features (micro-clusters) at once.
-   - For each edge (pair of nodes) we build a **symmetric pair embedding**:
-     - \([h_i, h_j, |h_i - h_j|, h_i \odot h_j]\) concatenated with the pairwise extra features  
-       (`center_dist`, `border_min_dist`, `log_density_diff`, `log_density_i`, `log_density_j`).
-   - A small MLP outputs a logit for “should these two micro-clusters belong to the same macro-cluster?”  
-   - Training label for each edge: 1 if micro-cluster majority labels match, else 0.
-   - We keep the **best epoch** (highest training accuracy, tie-broken by lower loss).
-
-5. **Hierarchical merging**
-   - Start with each micro-cluster as its own component (Union-Find).
-   - Sort edges by **decreasing** predicted probability \(P(	ext{merge})\).
-   - Merge components greedily along those edges until the number of components reaches `k_target`.
-   - If we still have more than `k_target` components (graph too sparse), we fall back to **distance-based** merges.
-
-6. **Assigning labels to points**
-   - **Train points**: each point belongs to a micro-cluster → map it to its macro-cluster.
-   - **Test points**: assign each to the nearest **effective** micro-cluster (the ones that actually appear after removing empty ones), then map that micro-cluster to a macro-cluster.
-
-7. **Evaluation & visualization**
-
-   For **train** and **test**, we compute:
-
-   - **External metrics** (using labels):
-     - NMI: Normalized Mutual Information  
-     - AMI: Adjusted Mutual Information  
-     - ARI: Adjusted Rand Index  
-     - FMI: Fowlkes–Mallows Index  
-     - ACC: Clustering accuracy with optimal label permutation (Hungarian)
-   - **Internal metrics** (geometry-only on predicted clusters):
-     - Silhouette score  
-     - Davies–Bouldin index  
-     - Calinski–Harabasz index  
-
-   And we generate a collection of diagnostic plots (all saved as transparent PNG under `outputs/<run_id>/figures/`):
-
-   - **Train/Test scatter plots**
-     - Train ground-truth clusters
-     - Train predicted clusters (title only shows NMI + ACC to avoid clutter)
-     - Test points with correct vs mis-clustered points highlighted (again NMI + ACC)
-   - **Full-dataset ground truth scatter** (entire \(X\), not just train)
-   - **Micro-cluster graph visualization**
-     - Micro-cluster centroids, colored by majority label
-     - Edges drawn between connected micro-clusters
-   - **Micro-cluster feature histograms**
-     - `log(1 + size)`, `radius_mean`, `radius_std`, `log_density`
-   - **Graph degree histogram** (node degree distribution)
-   - **Edge feature histograms**
-     - `center_dist`, `border_min_dist`, `log_density_diff`
-     - `log_density_i`, `log_density_j`
-   - **Distance matrix heatmap**
-     - Pairwise micro-centroid distance matrix
-   - **Pair-Transformers training curves**
-     - BCE loss vs epoch
-     - Pairwise accuracy vs epoch
-   - **Pairwise probability histograms**
-     - All \(P(	ext{merge})\)
-     - \(P(	ext{merge})\) split for “same majority label” vs “different majority label”
-   - **Per-metric bar plots (train vs test)**
-     - One figure per metric: NMI, AMI, ARI, FMI, Silhouette, Davies–Bouldin, Calinski–Harabasz, ACC.
-
----
-
-## Project structure
-
-```text
-gothic_project/
-  helper.py          # utilities: set_seed, majority_label, accuracy with mapping, UnionFind
-  dataset.py         # download/generate datasets into datasets/synthetic and datasets/real
-  loader.py          # load datasets by name (X, y)
-  gothic_model.py    # main implementation of GOTHIC (CLI-capable)
-  run_gothic.py      # convenience wrapper for GOTHIC only
-  runner.py          # generic runner: select model via --model (e.g., gothic)
-  README.md          # this file
-
-  datasets/          # (created when you download data)
-    synthetic/       # SIPU-style txt datasets, noisy_circles.csv
-    real/            # breast_cancer.csv, iris.csv, wine.csv
-
-  outputs/           # (created when you run models)
-    <run_id>/        # run-specific outputs (e.g., ID001)
-      checkpoints/   # saved models
-      figures/       # all PNG plots (transparent)
-        *_micro_graph.png
-        *_train_test.png
-        *_full_ground_truth.png
-        *_micro_features_hist.png
-        *_micro_graph_degree_hist.png
-        *_edge_features_hist.png
-        *_edge_density_features_hist.png
-        *_micro_distance_matrix.png
-        *_pair_training_curves.png
-        *_pair_score_hist.png
-        *_metric_*.png      # one per metric (NMI/AMI/ARI/FMI/Sil/DB/CH/ACC)
-      *_results.txt  # metrics summary for the run
-```
-
----
-
-## Installation
-
-You’ll need:
-
-- Python 3.9+ (3.11 recommended)
-- Packages listed in `requirements.txt`
-
-Basic install:
+Common pattern:
 
 ```bash
-pip install -r requirements.txt
+python runner.py --model <model_name> --run_id <ID> --dataset <dataset_name> ...other args...
 ```
+
+Currently supported (based on the latest benchmark runs):
+
+- `gothic` — Graph over micro-clusters + Transformer pair scorer + hierarchical merging (main method)
+- `kmeans` — KMeans baseline
+- `dbscan` — DBSCAN baseline
+- `hdbscan` — HDBSCAN baseline
+- `insdpc` — INSDPC baseline
+- `amd_dbscan` — AMD-DBSCAN baseline
+- `mdbscan` — MDBSCAN baseline
+- `spectral` — Spectral clustering baseline
+- `idec` — Improved Deep Embedded Clustering baseline
+- `gnn` — GNN clustering baseline
+- `gnn_contrastive` — contrastive GNN clustering variant
+
+> Note: different models accept different hyperparameters, but they share the same **experiment management** (`--dataset`, `--seed`, `--run_id`, `--data_root`, `--out_dir`) and produce a consistent **results.txt + figures** layout.
 
 ---
 
-## Datasets
+## Supported datasets
 
-### Supported synthetic datasets (`datasets/synthetic/`)
+### Synthetic (`datasets/synthetic/`)
 
-These come from the SIPU dataset collection and are downloaded as `.txt`:
+SIPU-style 2D datasets (downloaded as `.txt`):
 
 - `compound` → `Compound.txt`
 - `aggregation` → `Aggregation.txt`
@@ -187,30 +73,139 @@ These come from the SIPU dataset collection and are downloaded as `.txt`:
 - `pathbased` → `pathbased.txt`
 - `r15` → `R15.txt`
 
-And an extra synthetic dataset:
+Plus:
 
-- `noisy_circles` → **generated** via `sklearn.make_circles` and saved as `noisy_circles.csv` with columns:
-  - `x1, x2, label`
+- `noisy_circles` → generated via `sklearn.make_circles`, saved as `noisy_circles.csv` (`x1, x2, label`)
 
-### Supported real datasets (`datasets/real/`)
+### Real (`datasets/real/`)
 
-These are exported from scikit-learn and stored as CSV:
+CSV datasets (features + final `label` column):
 
-- `breast_cancer` → `breast_cancer.csv`
-- `iris` → `iris.csv`
-- `wine` → `wine.csv`
+- `breast_cancer`
+- `iris`
+- `wine`
+- `digits` (sklearn digits)
+- `olivetti_faces` (sklearn Olivetti faces)
 
-All real CSVs have:
-- feature columns first, and
-- a final `label` column.
+---
+
+## High-dimensional datasets (PCA / feature caps)
+
+Some datasets (e.g., **digits**, **olivetti_faces**) are high-dimensional. Recent updates add optional dimensionality control so runs remain stable and fast:
+
+- `--reduce_dim {none,pca}`  
+  - `none`: use original features  
+  - `pca`: reduce to `--pca_dim` components before graph + density features
+- `--pca_trigger_dim <int>`  
+  If the original dimensionality `d` is above this threshold, PCA reduction can be enabled automatically (depending on your configuration).
+- `--pca_dim <int>`  
+  PCA output dimensionality (common value: `128`).
+- `--max_density_dim <int>`  
+  Caps the dimensionality used specifically in density-related computations (common value: `64`).
+
+These settings are logged per run (e.g., `reduce_dim`, `used_dim`) so your summaries remain reproducible.
+
+---
+
+## High-level idea (GOTHIC)
+
+Given a dataset \(X \in \mathbb{R}^{N \times d}\) with labels \(y\) (used **only** for supervision at the micro-cluster level):
+
+1. **Over-cluster with KMeans**
+   - Choose `n_micro`.
+   - Run KMeans on the **train** subset only.
+   - Each micro-cluster has a centroid, boundary points, and a majority label.
+
+2. **Build a micro-cluster graph**
+   - Nodes: micro-clusters.
+   - Edges: connect pairs whose centroid distance is below a quantile threshold `dist_quantile`.
+   - Edge features include centroid distance, boundary distance, and density-based features.
+
+3. **Micro-cluster node features**
+   - Centroid coordinates + size/radius/density summaries.
+
+4. **Transformer-based pair scorer**
+   - Transformer encoder processes node features.
+   - MLP predicts edge merge probability \(P(\text{merge})\) for each graph edge.
+   - Best epoch is selected by training performance.
+
+5. **Hierarchical merging**
+   - Greedy Union-Find merging along highest \(P(\text{merge})\) edges until reaching `k_target`.
+   - If the graph is too sparse, fallback merges are distance-based.
+
+6. **Assign labels to points**
+   - Train points map micro → macro clusters.
+   - Test points map to nearest effective micro-cluster then macro cluster.
+
+7. **Evaluation & visualization**
+   - External metrics: NMI / AMI / ARI / FMI / ACC (Hungarian)
+   - Internal metrics: Silhouette / Davies–Bouldin / Calinski–Harabasz
+   - Diagnostic plots are saved as **transparent PNG** under each run’s `figures/` folder.
+
+---
+
+## Project structure (current)
+
+```text
+gothic_project/
+  helper.py
+  dataset.py
+  loader.py
+
+  gothic_model.py
+
+  # Baseline models
+  kmeans_model.py
+  dbscan_model.py
+  hdbscan_model.py
+  insdpc_model.py
+  amd_dbscan_model.py
+  mdbscan_model.py
+  spectral_model.py
+  idec_model.py
+  gnn_model.py
+  gnn_contrastive_model.py
+
+  runner.py
+  run.sh
+  requirements.txt
+
+  datasets/
+    synthetic/
+    real/
+
+  outputs/
+    <model_name>/
+      synthetic/
+        <run_id>/
+          checkpoints/
+          figures/
+          <dataset>_results.txt
+      real/
+        <run_id>/
+          checkpoints/
+          figures/
+          <dataset>_results.txt
+```
+
+> Your `--out_dir` can point anywhere, but the recent convention is:
+>
+> - `outputs/<model_name>/synthetic` for synthetic datasets
+> - `outputs/<model_name>/real` for real datasets
+
+---
+
+## Installation
+
+```bash
+pip install -r requirements.txt
+```
+
+Python 3.9+ is expected (3.11 recommended).
 
 ---
 
 ## `dataset.py` – downloading / generating datasets
-
-`dataset.py` ensures the datasets exist on disk.
-
-### CLI
 
 ```bash
 python dataset.py                       # download/generate ALL supported datasets
@@ -218,291 +213,100 @@ python dataset.py --datasets compound   # only Compound
 python dataset.py --datasets compound aggregation noisy_circles iris
 ```
 
-#### Arguments
-
-- `--datasets` (optional, one or more names)  
-  - If omitted or empty → **all** supported datasets are downloaded/generated.
-  - Supported names:
-    - Synthetic: `compound`, `aggregation`, `d31`, `flame`, `jain`, `pathbased`, `r15`, `noisy_circles`
-    - Real: `breast_cancer`, `iris`, `wine`
-
-### Programmatic usage
+Programmatic:
 
 ```python
 from dataset import ensure_dataset_exists
-
-path = ensure_dataset_exists("compound")      # ensures datasets/synthetic/Compound.txt
-path = ensure_dataset_exists("noisy_circles") # ensures datasets/synthetic/noisy_circles.csv
-path = ensure_dataset_exists("iris")          # ensures datasets/real/iris.csv
+path = ensure_dataset_exists("compound")
 ```
 
 ---
 
-## `loader.py` – loading datasets
+## `runner.py` – benchmark entry point
 
-`loader.py` loads a dataset by name and returns `(X, y)` as NumPy arrays.
+`runner.py` is the generic entry point that selects a model via `--model` and forwards the remaining CLI arguments.
 
-### Usage
-
-```python
-from loader import load_dataset
-
-X, y = load_dataset("compound")       # X: (N, 2),   y: (N,)
-X, y = load_dataset("noisy_circles")  # X: (N, 2),   y: (N,)
-X, y = load_dataset("iris")           # X: (N, d),   y: (N,)
-```
-
-Behavior:
-
-- Synthetic SIPU `.txt` datasets are assumed to have **3 columns**: `x, y, label (1..K)`.  
-  Labels are shifted to `0..K-1`.
-- `noisy_circles.csv` has 3 columns: `x1, x2, label (0..1)`.
-- Real CSV datasets (breast_cancer, iris, wine) are loaded with all but last column as features, and last column as integer labels.
-
-If the file does not exist, `load_dataset` calls `dataset.ensure_dataset_exists` to download/generate it.
-
----
-
-## `gothic_model.py` – the GOTHIC implementation
-
-This is the main script implementing the GOTHIC pipeline, including:
-
-- over-clustering,
-- graph construction,
-- Transformer-based pair scoring,
-- hierarchical merging,
-- and a rich evaluation + plotting suite.
-
-### Default dataset-specific `k_target`
-
-If you do **not** specify `--k_target` or you pass a value ≤ 0, GOTHIC uses these defaults:
-
-```python
-DEFAULT_K_TARGETS = {
-    "compound":      6,
-    "aggregation":   7,
-    "d31":           31,
-    "flame":         2,
-    "jain":          2,
-    "pathbased":     3,
-    "r15":           15,
-    "noisy_circles": 2,
-    "breast_cancer": 2,
-    "iris":          3,
-    "wine":          3,
-}
-```
-
-### CLI interface
-
-You can call it directly:
+Example (synthetic / Compound):
 
 ```bash
-python gothic_model.py --dataset compound --k_target 6
+python runner.py --model gothic --run_id compound_ID001 --dataset compound --seed 42 --train_fraction 0.8 --split_strategy balanced --n_micro 91 --kmeans_n_init 50 --kmeans_max_iter 500 --dist_quantile 0.3 --b_boundary 5 --d_model 32 --n_heads 4 --attn_hidden 64 --n_transformer_layers 2 --train_epochs 2000 --lr 0.001 --weight_decay 0.0001 --k_target 6 --data_root datasets --out_dir outputs/gothic/synthetic
 ```
 
-or via `runner.py` / `run_gothic.py` (see below).
+---
 
-#### All arguments
+## Outputs
+
+Each run writes:
+
+- `<out_dir>/<run_id>/<dataset>_results.txt` — metrics summary for train/test
+- `<out_dir>/<run_id>/figures/*.png` — transparent diagnostic figures
+- `<out_dir>/<run_id>/checkpoints/*` — saved model checkpoints (when applicable)
+
+Recent convention examples:
 
 ```text
---dataset <str>            Dataset name (synthetic or real). Default: compound.
-                           Supported: compound, aggregation, d31, flame, jain,
-                           pathbased, r15, noisy_circles, breast_cancer, iris, wine.
-
---seed <int>               Random seed (Python, NumPy, PyTorch). Default: 42.
-
---train_fraction <float>   Fraction of data used for training (0-1). Default: 0.8.
-
---split_strategy <str>     Train/test split strategy. Default: balanced.
-                           Options:
-                             - random   : random 80/20 split
-                             - balanced : density-aware per-cluster split
-                                          (keeps more boundary points in train).
-
---data_root <str>          Base directory for datasets. Default: datasets.
-
---out_dir <str>            Base directory for outputs. Default: outputs.
-
---run_id <str>             Run identifier. All outputs go under:
-                             out_dir / run_id /
-                           Default: "default".
-
---n_micro <int>            Number of KMeans micro-clusters for over-clustering. Default: 80.
-
---kmeans_n_init <int>      KMeans n_init parameter. Default: 50.
-
---kmeans_max_iter <int>    KMeans max_iter. Default: 500.
-
---dist_quantile <float>    Quantile for thresholding centroid distances to form edges
-                           in the micro-cluster graph. Default: 0.3.
-                           Smaller -> sparser graph; larger -> denser graph.
-
---b_boundary <int>         Number of boundary points per micro-cluster used for
-                           border-distance computation. Default: 5.
-
---d_model <int>            Transformer hidden dimension (node embedding size).
-                           Default: 32.
-
---n_heads <int>            Number of attention heads in Transformer. Default: 4.
-
---attn_hidden <int>        Hidden dimension in the pairwise MLP. Default: 64.
-
---n_transformer_layers <int>
-                           Number of Transformer encoder layers. Default: 2.
-
---train_epochs <int>       Number of epochs for training the pairwise Transformer.
-                           Default: 2000.
-
---lr <float>               Learning rate for Adam optimizer. Default: 1e-3.
-
---weight_decay <float>     Weight decay (L2 regularization) in Adam. Default: 1e-4.
-
---print_every <int>        How frequently to print training stats. Default: 200.
-
---k_target <int>           Target number of macro-clusters. If <= 0, use dataset-
-                           specific default (see table above).
-
---show_plots               If provided, show matplotlib windows interactively
-                           (in addition to saving PNG files).
-                           This is a boolean flag; no value required.
+outputs/gothic/real/wine_ID001/wine_results.txt
+outputs/gothic/real/wine_ID001/figures/wine_metric_acc.png
 ```
 
-### Outputs and directory layout
+---
 
-For a command like:
+## Result summaries (`results_summary.csv`)
+
+Recent benchmark runs produce a consolidated CSV (example: `results_summary.csv`) containing:
+
+- dataset, model, run_id, seed
+- key hyperparameters (where applicable)
+- train/test metrics (NMI/AMI/ARI/FMI/ACC + internal metrics)
+
+Quick “best per dataset” snippet:
+
+```python
+import pandas as pd
+
+df = pd.read_csv("results_summary.csv")
+
+best = (
+    df.sort_values("test_acc", ascending=False)
+      .groupby("dataset", as_index=False)
+      .first()[["dataset", "model", "test_acc", "test_nmi", "test_ari"]]
+)
+
+print(best)
+```
+
+---
+
+## Ablation studies (seeds + one-factor sweeps)
+
+To measure stability and sensitivity (confidence intervals, variance, plots), use an ablation script like `ablation_study.py`:
+
+- **Seed sweep:** same config across multiple seeds → mean/std/var + plots
+- **One-factor sweeps (seed fixed):** vary one hyperparameter at a time (e.g., `n_micro`, `dist_quantile`, Transformer depth)
+
+Typical usage:
 
 ```bash
-python gothic_model.py --dataset compound --k_target 6 --run_id ID001 --out_dir outputs
+python ablation_study.py                 # runs seed sweep + ablations (default)
+python ablation_study.py --only_seed_sweep
+python ablation_study.py --only_ablations
+python ablation_study.py --no_skip_existing
 ```
 
-you get:
+Outputs are saved under:
 
 ```text
-outputs/
-  ID001/
-    checkpoints/
-      gothic_pair_transformer_best_compound.pt   # best pairwise model
-    figures/
-      compound_micro_graph.png
-      compound_train_test.png
-      compound_full_ground_truth.png
-      compound_micro_features_hist.png
-      compound_micro_graph_degree_hist.png
-      compound_edge_features_hist.png
-      compound_edge_density_features_hist.png
-      compound_micro_distance_matrix.png
-      compound_pair_training_curves.png
-      compound_pair_score_hist.png
-      compound_metric_nmi.png
-      compound_metric_ami.png
-      compound_metric_ari.png
-      compound_metric_fmi.png
-      compound_metric_silhouette.png
-      compound_metric_daviesbouldin.png
-      compound_metric_calinskiharabasz.png
-      compound_metric_acc.png
-    compound_results.txt                         # metrics summary (train/test)
-```
-
-`*_results.txt` contains:
-
-- dataset, run_id
-- seed, split_strategy, train_fraction
-- n_micro, k_target, dist_quantile
-- All **train** + **test** metrics:
-  - NMI, AMI, ARI, FMI, Silhouette, Davies–Bouldin, Calinski–Harabasz, ACC
-
----
-
-## `runner.py` – generic model runner with `--model`
-
-`runner.py` is a generic entry point that chooses which model to run based on `--model`.
-
-Currently supported:
-
-- `--model gothic` → runs `gothic_model.py`.
-
-Everything **after** `--model ...` is passed unchanged to the chosen model script.
-
-### Usage
-
-```bash
-# Run GOTHIC on Compound with full hyperparameters
-python runner.py --model gothic --run_id ID001 --dataset compound --seed 42 --train_fraction 0.8 --split_strategy balanced --n_micro 80 --kmeans_n_init 50 --kmeans_max_iter 500 --dist_quantile 0.3 --b_boundary 5 --d_model 32 --n_heads 4 --attn_hidden 64 --n_transformer_layers 2 --train_epochs 2000 --lr 0.001 --weight_decay 0.0001 --k_target 6 --data_root datasets --out_dir outputs --show_plots
-```
-
-The above is equivalent to calling `gothic_model.py` directly with the same arguments.
-
-Later, if you add other models (e.g., `--model spectral`, `--model dbscan_transformer`), you simply:
-
-- create a corresponding `*_model.py` file, and
-- add a branch in `runner.py` to map `--model` to that script.
-
----
-
-## Quick start examples
-
-### 1. Download all datasets
-
-```bash
-python dataset.py
-```
-
-### 2. Run GOTHIC on Compound (minimal)
-
-Uses defaults: `seed=42`, `train_fraction=0.8`, `split_strategy=balanced`,
-`n_micro=80`, `k_target=6` (from dataset-specific defaults), etc.
-
-```bash
-python runner.py --model gothic --dataset compound --run_id cmp_default
-```
-
-### 3. Run GOTHIC on Compound with explicit hyperparams
-
-```bash
-python runner.py --model gothic --run_id ID001 --dataset compound --seed 42 --train_fraction 0.8 --split_strategy balanced --n_micro 80 --kmeans_n_init 50 --kmeans_max_iter 500 --dist_quantile 0.3 --b_boundary 5 --d_model 32 --n_heads 4 --attn_hidden 64 --n_transformer_layers 2 --train_epochs 2000 --lr 0.001 --weight_decay 0.0001 --k_target 6 --data_root datasets --out_dir outputs --show_plots
-```
-
-### 4. Run GOTHIC on Iris
-
-```bash
-python runner.py --model gothic --run_id IRIS01 --dataset iris --k_target 3 --n_micro 40
-```
-
-### 5. Run GOTHIC on noisy_circles
-
-```bash
-python runner.py --model gothic --run_id CIRC01 --dataset noisy_circles --k_target 2 --n_micro 50
+<out_dir>/ABlationReports/<dataset>/<timestamp>/
+  seed_sweep_raw.csv
+  seed_sweep_stats.csv
+  ablations_raw.csv
+  plots/*.png   # transparent
 ```
 
 ---
 
 ## Reproducibility notes
 
-- `--seed` controls random seeds for:
-  - Python’s `random`,
-  - NumPy,
-  - PyTorch (CPU and CUDA, if available).
-- `--run_id` is intended as an experiment ID — you can run:
-  - `run_id=cmp01`, `cmp02`, `cmp03` … and inspect each directory separately.
-- For exact reproducibility, keep:
-  - dataset,
-  - all CLI arguments,
-  - library versions (NumPy, scikit-learn, PyTorch, …).
-
----
-
-## Extending GOTHIC & the project
-
-- You can modify GOTHIC’s internals (e.g., add more node features, pair features, or different merging strategies) **without** changing the CLI.
-- To add **another model** alongside GOTHIC:
-  1. Create a new script, e.g. `my_model.py` with its own `main(args)`.
-  2. Update `runner.py` to map `--model my_model` to that script.
-  3. Use `runner.py --model my_model ...` to run it.
-
-This design lets you build a small library of clustering models all sharing:
-
-- the same dataset helpers (`dataset.py`, `loader.py`),
-- the same experiment management (`run_id`, `out_dir`),
-- and a uniform CLI pattern.
+- `--seed` controls random seeds for Python / NumPy / (PyTorch when used).
+- Keep dataset + all CLI args + library versions fixed for exact reproducibility.
+- `--run_id` is intended as an experiment ID; use unique IDs per run to avoid overwriting outputs.
