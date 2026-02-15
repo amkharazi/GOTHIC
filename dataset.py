@@ -17,6 +17,8 @@ Supports:
     - breast_cancer
     - iris
     - wine
+    - digits
+    - olivetti_faces
 
 Usage:
   python dataset.py                 # download/generate all datasets
@@ -32,7 +34,7 @@ import numpy as np
 # Ensure local imports work when run as a script
 sys.path.append(str(Path(__file__).resolve().parent))
 
-from sklearn.datasets import make_circles, load_breast_cancer, load_iris, load_wine
+from sklearn.datasets import make_circles, load_breast_cancer, load_iris, load_wine, load_digits, fetch_olivetti_faces
 
 SIPU_BASE_URL = "http://cs.joensuu.fi/sipu/datasets/"
 
@@ -49,7 +51,7 @@ SIPU_DATASETS = {
     "r15": "R15.txt",
 }
 
-REAL_DATASETS = {"breast_cancer", "iris", "wine"}
+REAL_DATASETS = {"breast_cancer", "iris", "wine", "digits", "olivetti_faces"}
 
 SUPPORTED_DATASETS = set(SIPU_DATASETS.keys()) | {"noisy_circles"} | REAL_DATASETS
 
@@ -122,6 +124,10 @@ def generate_real_dataset(name: str, base_dir: Path = Path("datasets")) -> Path:
         ds = load_iris()
     elif name == "wine":
         ds = load_wine()
+    elif name == "digits":
+        ds = load_digits()
+    elif name == "olivetti_faces":
+        ds = fetch_olivetti_faces()
     else:
         raise ValueError(f"Unsupported real dataset: {name}")
 
