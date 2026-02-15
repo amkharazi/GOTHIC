@@ -9,7 +9,9 @@ and then loads it into (X, y) NumPy arrays.
 Conventions:
   - Synthetic SIPU-style txt datasets have 3 columns: x, y, label (1..K). We convert labels to 0..K-1.
   - noisy_circles.csv has columns: x1, x2, label (0..1).
-  - Real CIF-like CSVs from sklearn have many feature columns and a final "label" column.
+  - Real CSV datasets (materialized by dataset.py) have many feature columns and a final "label" column.
+    This includes:
+      breast_cancer, iris, wine, digits, olivetti_faces
 """
 
 import sys
